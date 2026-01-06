@@ -1,0 +1,151 @@
+/* 
+==========================================================================
+* Sidebar
+==========================================================================
+*/
+
+// define transition time for the overlay (sidebar blocking)
+$transition-time-overlay: 250ms;
+$transition-time-close: 0.4s;
+
+$sidebarpage-maincontent-width: 100vw - $sidebar-width;
+$menu-maincontent-deduction: ($sidebarpage-maincontent-width / 1vw) / 100 *
+    $menu-width;
+$menu-sidebar-deduction: (($sidebar-width / 1vw) / 100) * $menu-width;
+
+// == Check if the part above is still needed, as this makes the code below too specific.
+
+.sidebar-page {
+    height: 100%;
+    padding-top: 0;
+
+    .content-and-sidebar {
+        height: 100%;
+        overflow-x: hidden;
+        padding: 0;
+        & > .row {
+            height: 100%;
+        }
+    }
+}
+
+.sidebar-scrollcontainer {
+    height: 100%;
+    max-width: 100%;
+    padding: $space-lg;
+    background-color: $bg-color-secondary;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 60;
+}
+
+.sidebar-scrollcontainer-header {
+    h2,
+    h3 {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+}
+
+.sidebar-scrollcontainer-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+// Main content (next to side panel)
+.main-content-column {
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+// Sidebar panel
+
+.sidebar-panel-column {
+    flex-basis: auto;
+    background: $bg-color-secondary;
+    padding: 0;
+    width: 100%;
+    max-height: 100%;
+    border-left: 1px solid $midnight-10;
+    transition: width $default-transition-time ease-in,
+    border-width $default-transition-time, margin $default-transition-time;
+
+    &:empty {
+        transition: width $transition-time-close ease-out;
+    }
+
+    > .mx-dataview {
+        height: 100%;
+    }
+
+    // !important statement is (unfortunately) needed due to inline stying on the height of a mx-dataview-content element
+    > .mx-dataview > .mx-dataview-content {
+        height: 100% !important;
+    }
+
+    &.sidebar-blocking {
+        &:not(:empty):before {
+            content: "";
+            position: fixed;
+			width: 100%;
+            height: 100%;
+            background-color: rgba(#000000, 0.4);
+            left: 0;
+			transition: left $transition-time-overlay ease-in;
+            z-index: 55; // was set to 1. Now set to 55 to work with the Sidepanel
+        }
+    }
+
+    &:empty {
+        width: 0;
+    }
+}
+
+.mx-scrollcontainer-open {
+	.sidebar-panel-column {
+		&.sidebar-blocking {
+			&:not(:empty):before {
+			    left: $menu-width;
+                transition: left $transition-time-overlay ease-out;
+			}
+		}
+	}
+}
+
+.layoutgrid-maxed {
+    margin: 0 auto;
+
+    h3 {
+        margin-top: 0;
+    }
+}
+
+//Sidebar overlay
+.sidebar-overlay {
+    position: absolute;
+    padding: 0;
+    right: 0;
+    top: 0;
+    height: 100%;
+    transition: width $default-transition-time ease-in,
+    border-width $default-transition-time, margin $default-transition-time;
+}
+
+/*
+==========================================================================
+* When used in Page tabcontainer
+==========================================================================
+*/
+
+.page-tabcontainer {
+	// Fix behaviour when sidepanel is used in a full page tabcontainer
+	position: relative;
+	top: -$space-sm;
+
+    .sidebar-overlay {
+        top: $space-sm + $space-lg;
+        max-height: calc(100% - #{$space-lg});
+    }
+}
+

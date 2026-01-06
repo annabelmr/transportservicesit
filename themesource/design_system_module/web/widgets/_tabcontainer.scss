@@ -1,0 +1,56 @@
+/*
+=======================================================================
+* Mendix tabcontainer - The default tabcontainer
+========================================================================
+*/
+
+.mx-tabcontainer-tabs {
+  margin-bottom: $space-md;
+  box-sizing: border-box;
+  border-bottom: solid 1px $border-default;
+  font-weight: 600;
+  background-color: $bg-color;
+
+  li {
+    margin-bottom: -2px;
+
+    a {
+      background-color: transparent;
+      color: $text-default;
+      padding: $spacing-inner-l $spacing-inner-xl;
+      border: none;
+      border-bottom: 4px solid transparent;
+      margin-bottom: 1px;
+      margin-right: 0;
+
+      &:active,
+      &:focus,
+      &:hover {
+        background: none;
+        border-bottom: 4px solid transparent;
+      }
+    }
+
+    &.active {
+      a {
+        &,
+        &:hover,
+        &:focus,
+        &:active {
+          background: none;
+          border: none;
+          color: inherit;
+          margin-bottom: 1px;
+          border-bottom: 4px solid $border-selected;
+        }
+      }
+    }
+  }
+}
+
+.mx-tabcontainer {
+  .mx-tabcontainer-tabs {
+    //@include layout-gutter-mixin();
+  }
+}
+

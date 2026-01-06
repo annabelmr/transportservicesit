@@ -1,0 +1,550 @@
+/*
+==========================================================================
+* Buttons
+
+  Colors can be changed in the [companyname]-variables.scss file.
+==========================================================================
+*/
+
+// == Placeholder selectors
+
+%button-focus {
+  outline: 2px solid $btn-focus;
+  outline-offset: 2px;
+}
+
+%no-box-shadow {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+%hover-state {
+  //text-decoration: underline 1px;
+}
+
+%pressed-state {
+}
+
+// == Add spacing between components
+.btn ~ .btn,
+.btn ~ .btn-group,
+.btn-group ~ .btn-group,
+.mx-link ~ .mx-link,
+.btn ~ .mx-link {
+  margin-left: $space-xs;
+}
+
+//MXUI override
+.mx-dataview-controls .mx-button + .mx-button,
+.modal-footer .btn + .btn{
+  margin-left: 1rem;
+}
+
+.mx-text ~ .mx-link,
+.mx-link ~ .mx-text {
+  margin-left: $space-xxs;
+}
+
+/*
+==========================================================================
+* Default Button styling
+==========================================================================
+*/
+
+
+
+.btn,
+.mx-button {
+  @extend %fast-transition;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid transparent;
+  font-size: $btn-font-size;
+  font-weight: bold;
+  border-radius: $btn-border-radius;
+  padding: $space-xs $space-sm;
+  line-height: $btn-line-height;
+
+  .glyphicon, .POSTNL_Icons, .mx-icon-lined, .POSTNL_Icons_a {
+    margin-right: $spacing-inner-s;
+  }
+  .POSTNL_Icons {
+    font-size: 1rem;
+    //overflow: hidden;
+  }
+  .POSTNL_Icons_a {
+    font-size: 1rem;
+    //overflow: hidden;
+  }
+  .POSTNL_Icons::before {
+  display: inline-block;
+  }
+}
+
+
+
+.mx-link {
+  padding: 0;
+  color: $btn-link-color;
+  font-weight: bold;
+
+  .glyphicon-step-forward,
+  .glyphicon-step-backward {
+    font-size: $font-size-large;
+    line-height: $font-size-default;
+    vertical-align: middle;
+    top: -2px;
+  }
+
+  &:hover {
+    //text-decoration: underline;
+  }
+
+  &:active,
+  .active {
+    color: $text-button-tertiary-pressed;
+    //icon color: $icon-button-tertiary-pressed;
+  }
+
+  &:focus {
+    @extend %button-focus;
+    color: $btn-link-color;
+  }
+
+  &[disabled],
+  &.disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.4;
+  }
+}
+
+.btn-default {
+  background-color: $btn-default-bg;
+  border-color: $btn-default-border-color;
+  color: $btn-default-color;
+
+  &:hover {
+    @extend %hover-state;
+    // background-color: rgba($brand-default, 0.1);
+    // border-color: $btn-default-border-color;
+    // color: $btn-default-color;
+    background-color: $btn-default-bg;
+    border-color: $btn-default-border-color;
+    color: $btn-default-color;
+
+    &:focus {
+      @extend %button-focus;
+      background-color: rgba($brand-default, 0.1);
+      border-color: $btn-default-border-color;
+      color: $btn-default-color;
+    }
+  }
+
+  &:focus {
+    @extend %button-focus;
+    background-color: $btn-default-bg;
+    border-color: $btn-default-border-color;
+    color: $btn-default-color;
+  }
+
+  &:active {
+    @extend %no-box-shadow;
+    background-color: rgba($brand-default, 0.2);
+    border-color: $btn-default-color;
+
+    &:focus {
+      @extend %button-focus;
+    }
+  }
+
+  &[disabled],
+  &.disabled {
+    background-color: $btn-default-bg;
+    border-color: $btn-default-border-color;
+    opacity: 0.4;
+  }
+}
+
+.btn-primary {
+  background-color: $btn-primary-bg;
+  border-color: $btn-primary-border-color;
+  color: $btn-primary-color;
+
+  &:hover {
+    @extend %hover-state;
+    // background-color: mix($btn-primary-bg, black, 80%);
+    // border-color: mix($btn-primary-bg, black, 80%);
+    // color: $btn-primary-color;
+    background-color: $btn-primary-bg;
+    border-color: $btn-primary-border-color;
+    color: $btn-primary-color;
+
+    &:focus {
+      @extend %button-focus;
+      background-color: mix($btn-primary-bg, black, 80%);
+      border-color: mix($btn-primary-bg, black, 80%);
+      color: $btn-primary-color;
+    }
+  }
+
+  &:focus {
+    @extend %button-focus;
+    background-color: $btn-primary-bg;
+    border-color: $btn-primary-border-color;
+    color: $btn-primary-color;
+  }
+
+  &:active {
+    @extend %no-box-shadow;
+    background-color: mix($btn-primary-bg, black, 60%);
+    border-color: mix($btn-primary-bg, black, 60%);
+
+    &:focus {
+      @extend %button-focus;
+    }
+  }
+
+  &[disabled],
+  &.disabled {
+    background-color: $btn-primary-bg;
+    border-color: $btn-primary-border-color;
+    opacity: 0.4;
+  }
+}
+
+.btn-success {
+  background-color: $btn-success-bg;
+  border-color: $btn-success-border-color;
+  color: $btn-success-color;
+
+  &:hover {
+    background-color: mix($btn-success-bg, black, 80%);
+    border-color: mix($btn-success-bg, black, 80%);
+    color: $btn-success-color;
+
+    &:focus {
+      @extend %button-focus;
+      background-color: mix($btn-success-bg, black, 80%);
+      border-color: mix($btn-success-bg, black, 80%);
+      color: $btn-success-color;
+    }
+  }
+
+  &:focus {
+    @extend %button-focus;
+    background-color: $btn-success-bg;
+    border-color: $btn-success-border-color;
+    color: $btn-success-color;
+  }
+
+  &:active {
+    @extend %no-box-shadow;
+    background-color: mix($btn-success-bg, black, 60%);
+    border-color: mix($btn-success-bg, black, 60%);
+
+    &:focus {
+      @extend %button-focus;
+    }
+  }
+
+  &[disabled],
+  &.disabled {
+    background-color: $btn-success-bg;
+    border-color: $btn-success-border-color;
+    opacity: 0.4;
+  }
+}
+
+.btn-warning {
+  background-color: $btn-warning-bg;
+  border-color: $btn-warning-border-color;
+  color: $btn-warning-color;
+
+  &:hover {
+    background-color: mix($btn-warning-bg, black, 80%);
+    border-color: mix($btn-warning-bg, black, 80%);
+    color: $btn-warning-color;
+
+    &:focus {
+      @extend %button-focus;
+      background-color: mix($btn-warning-bg, black, 80%);
+      border-color: mix($btn-warning-bg, black, 80%);
+      color: $btn-warning-color;
+    }
+  }
+
+  &:focus {
+    @extend %button-focus;
+    background-color: $btn-warning-bg;
+    border-color: $btn-warning-border-color;
+    color: $btn-warning-color;
+  }
+
+  &:active {
+    @extend %no-box-shadow;
+    background-color: mix($btn-warning-bg, black, 60%);
+    border-color: mix($btn-warning-bg, black, 60%);
+
+    &:focus {
+      @extend %button-focus;
+    }
+  }
+
+  &[disabled],
+  &.disabled {
+    background-color: $btn-warning-bg;
+    border-color: $btn-warning-border-color;
+    opacity: 0.4;
+  }
+}
+
+.btn-danger {
+  background-color: $btn-danger-bg;
+  border-color: $btn-danger-border-color;
+  color: $btn-danger-color;
+
+  &:hover {
+    background-color: mix($btn-danger-bg, black, 80%);
+    border-color: mix($btn-danger-bg, black, 80%);
+    color: $btn-danger-color;
+
+    &:focus {
+      @extend %button-focus;
+      background-color: mix($btn-danger-bg, black, 80%);
+      border-color: mix($btn-danger-bg, black, 80%);
+      color: $btn-danger-color;
+    }
+  }
+
+  &:focus {
+    @extend %button-focus;
+    background-color: $btn-danger-bg;
+    border-color: $btn-danger-border-color;
+    color: $btn-danger-color;
+  }
+
+  &:active {
+    @extend %no-box-shadow;
+    background-color: mix($btn-danger-bg, black, 60%);
+    border-color: mix($btn-danger-bg, black, 60%);
+
+    &:focus {
+      @extend %button-focus;
+    }
+  }
+
+  &[disabled],
+  &.disabled {
+    background-color: $btn-danger-bg;
+    border-color: $btn-danger-border-color;
+    opacity: 0.4;
+  }
+}
+
+.btn-inverse, .btn-info {
+  background-color: $btn-inverse-bg;
+  border-color: $btn-inverse-border-color;
+  color: $btn-inverse-color;
+
+  &:hover {
+    background-color: mix($btn-inverse-bg, white, 80%);
+    border-color: mix($btn-inverse-bg, white, 80%);
+    color: $btn-inverse-color;
+
+    &:focus {
+      @extend %button-focus;
+      background-color: mix($btn-inverse-bg, white, 80%);
+      border-color: mix($btn-inverse-bg, white, 80%);
+      color: $btn-inverse-color;
+    }
+  }
+
+  &:focus {
+    @extend %button-focus;
+    background-color: $btn-inverse-bg;
+    border-color: $btn-inverse-border-color;
+    color: $btn-inverse-color;
+  }
+
+  &:active {
+    @extend %no-box-shadow;
+    background-color: mix($btn-inverse-bg, white, 60%);
+    border-color: mix($btn-inverse-bg, white, 60%);
+
+    &:focus {
+      @extend %button-focus;
+    }
+  }
+
+  &[disabled],
+  &.disabled {
+    background-color: $btn-inverse-bg;
+    border-color: $btn-inverse-border-color;
+    opacity: 0.4;
+  }
+}
+
+.btn-link {
+  border-color: transparent;
+  background-color: transparent;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    border-color: transparent;
+    background-color: rgba($brand-default, 0.1);
+  }
+  &:active {
+    background-color: rgba($brand-default, 0.15);
+  }
+  &.btn-primary {
+    color: $brand-primary;
+  }
+  &.mx-link {
+    display: inline-block;
+    vertical-align: middle;
+    padding: $space-xs $space-sm;
+    color: $brand-default;
+
+    &:hover,
+    &:focus {
+      color: $brand-primary;
+      background-color: transparent;
+    }
+    &:active {
+      color: darken($brand-primary, 10%);
+    }
+
+    &.link-primary {
+      color: $brand-primary;
+
+      &:hover,
+      &:focus {
+        color: darken($brand-primary, 10%);
+      }
+      &:active {
+        color: darken($brand-primary, 20%);
+      }
+    }
+  }
+}
+
+/*
+==========================================================================
+* Buttons placed in the topbar
+==========================================================================
+*/
+.nav-toggle-btn {
+  color: $topbar-color;
+  background-color: $topbar-bg;
+  padding-left: $space-xs + $space-xxs;
+  padding-right: $space-xs + $space-xxs;
+  border: none;
+
+  .glyphicon {
+    margin-right: unset;
+  }
+
+  &:hover {
+    color: $topbar-color;
+    background-color: mix($topbar-bg, white, 80%);
+    border: none;
+
+    &:focus {
+      color: $topbar-color;
+    }
+  }
+
+  &:active {
+    color: $topbar-color;
+    background-color: mix($topbar-bg, white, 80%);
+    border: none;
+
+    &:focus {
+      color: $topbar-color;
+    }
+  }
+
+  &:focus {
+    color: $topbar-color;
+  }
+}
+
+.logout-btn {
+  @extend .nav-toggle-btn;
+}
+
+/*
+==========================================================================
+* Buttons placed in a header
+==========================================================================
+*/
+
+//-- Back button styling
+.header-back-button {
+  display: block;
+  font-size: $font-size-small;
+  margin-bottom: $space-xs;
+  position: absolute;
+  top: calc(-1 * 1rem * #{$line-height-base});
+
+  &:hover {
+    text-decoration: none;
+  }
+  &:before {
+    @extend %glyphicon;
+    content: "\e091";
+    font-weight: bold;
+    margin-right: $space-xs;
+  }
+}
+
+/*
+==========================================================================
+* Design property
+==========================================================================
+*/
+
+.btn-icon-only {
+  aspect-ratio: 1/1;
+  max-height: 40px;
+  padding: $spacing-inner-m;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  img,
+  span,
+  .glyphicon {
+    margin-right: 0;
+  }
+  .POSTNL_Icons {
+    font-size: 1.25rem;
+    margin-right: 0;
+    overflow: unset;
+  }
+  .POSTNL_Icons_a {
+    font-size: 1.25rem;
+    margin-right: 0;
+    overflow: unset;
+  }
+}
+
+.btn-icon-right {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  span.POSTNL_Icons {
+    margin-right: 0px;
+  }
+  & > img,
+  & > .glyphicon,
+  & > .mx-icon-lined,
+  & > .mx-icon-filled {
+    top: 0;
+    margin-left: 4px;
+  }
+  span {
+    margin-left: $spacing-inner-s;
+  }
+}

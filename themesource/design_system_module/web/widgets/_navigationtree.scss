@@ -1,0 +1,81 @@
+/*
+==========================================================================
+* Navigation Tree
+==========================================================================
+*/
+
+// == Placeholder selectors
+
+%navigation-focus {
+	outline: 2px solid $navigation-focus;
+	outline-offset: 4px;
+    color: white;  
+}
+
+/*
+==========================================================================
+* Default Navigation Tree styling
+==========================================================================
+*/
+
+.mx-navigationtree {
+    background-color: $navigation-bg;
+
+    li {
+        border-bottom: unset;
+
+        li {
+            margin-left: unset;
+            padding: unset;
+        }
+    }
+
+    a {
+        padding: $navsidebar-padding;
+    }
+
+    a:hover {
+        background-color: mix($navigation-bg, white, 90%);
+    }
+
+    a:active {
+        background-color: mix($navigation-bg, white, 90%);
+    }
+
+    a:focus {
+        @extend %navigation-focus;
+        background-color: $navigation-bg; 
+    }
+
+    .mx-navigationtree-has-items {
+        ul {
+            background-color: $navigation-bg;
+
+            a   {
+                background-color: $navigation-bg;
+                color: white;
+                padding: $space-xs $space-md $space-xs $space-xl;
+            }
+
+            a:hover {
+                background-color: mix($navigation-bg, white, 90%);
+                color: white;
+            }
+
+            a:active, a.active {
+                background-color: mix($navigation-bg, white, 90%);
+                color: white;
+            }
+
+            a:focus {
+                @extend %navigation-focus;
+                background-color: $navigation-bg;   
+            }
+        
+        }
+    } 
+}
+
+.caret {
+    margin-left: $space-xxs;
+}

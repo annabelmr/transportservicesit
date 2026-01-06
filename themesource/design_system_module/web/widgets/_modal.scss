@@ -1,0 +1,83 @@
+/*
+==========================================================================
+* Modals and popups - Rules for the default Mendix / Bootstrap modal
+==========================================================================
+*/
+
+.modal-content {
+  padding: $spacing-inner-s;
+
+  //Header
+  .modal-header {
+    padding: $spacing-inner-xxl $spacing-inner-xxl $spacing-inner-s;
+    border: 0px;
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      color: $heading-brand;
+    }
+    button.close {
+      visibility: hidden;
+      margin-top: -$spacing-inner-xxl;
+      margin-right: -$spacing-inner-xxl;
+      opacity: 1;
+      &:hover {
+        opacity: 0.7;
+      }
+      &:before {
+        width: 32px;
+        height: 32px;
+        visibility: visible;
+        @extend .POSTNL_Icons;
+        content: "\e94c";
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: $default-secondary-bluestrong;
+        font-size: 1rem;
+      }
+    }
+  }
+
+  //Body
+  .modal-body {
+    padding: $spacing-inner-s $spacing-inner-xxl $spacing-inner-xxl;
+    .form-horizontal .form-group {
+      margin-left: 0px;
+      margin-right: 0px;
+    }
+    .mx-dataview-controls {
+      padding: $spacing-inner-s 0px 0px;
+      .mx-button {
+        margin-bottom: 0px;
+        z-index: 999;
+      }
+    }
+  }
+  //Footer
+
+  .modal-footer {
+    padding: 0px $spacing-inner-xxl $spacing-inner-xxl;
+    border-top: 0px;
+    .mx-button + .mx-button {
+      margin-left: 1rem;
+    }
+  }
+}
+
+.mx-dialog {
+  .modal-footer {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: end;
+    .btn{
+       // min-width: 80px;
+        & + .btn{
+           margin-right: 1rem;
+        }
+    }
+  }
+}

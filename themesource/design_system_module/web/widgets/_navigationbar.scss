@@ -1,0 +1,132 @@
+/*
+==========================================================================
+* Mendix navigationbar - The default navigationbar
+==========================================================================
+*/
+//
+// DISCLAIMER:
+// Do not change this file because it is core styling.
+// Customizing core files will make updating Atlas much more difficult in the future.
+// To customize any core styling, copy the part you want to customize to styles/web/sass/app/ so the core styling is overwritten.
+//
+
+/* ==========================================================================
+   Navigation
+
+   Default Mendix Navigation Bar
+========================================================================== */
+$topbar-nav-color: $default-secondary-bluestrong;
+$navigation-bg-hover: transparent;
+$navigation-color-active: $text-button-tertiary-pressed;
+$navigation-color-hover: $topbar-nav-color;
+$navigation-color: $topbar-nav-color;
+
+
+.mx-navbar {
+	.nav {
+		.mx-navbar-item {
+			margin-right: $spacing-outer-s;
+            &:hover{
+                background-color: transparent;
+            }
+			a {
+                font-weight: normal;
+                padding: $spacing-inner-m;
+                color: $topbar-nav-color;
+                &:hover, &:active {
+                  background-color: transparent;
+                  text-decoration: underline;
+                }
+
+				//border-radius: 0;
+				font-size: $fontsize-xs;
+				//font-weight: $font-weight-normal;
+
+				/* Dropdown arrow */
+				.caret {
+					border: none;
+					@extend .POSTNL_Icons;
+					height: 20px;
+					display: inline-flex;
+					align-items: center;
+					padding: 0px 4px;
+					&:before{
+
+						content: '\e93f';
+					}
+				}
+				// Image
+				img {
+					width: 20px; // Default size (so it looks good)
+					height: auto;
+					margin-right: 0.5em;
+				}
+				.glyphicon {
+					top: 0;
+					margin-right: 0.5em;
+					vertical-align: middle;
+					font-size: $navigation-glyph-size;
+				}
+				&:hover,
+				&:focus,
+				&:active,
+				&.active {
+					
+					color: $navigation-color-hover;
+					background-color: $navigation-bg-hover;
+                    
+					.caret {
+						border: none;
+					}
+				}
+				&:active,
+				&.active {
+					color: $navigation-color-active;
+					background-color: transparent;
+				}
+			}
+
+			&.active,
+			&.open {
+				a {
+					text-decoration: none;
+					color: $navigation-color-hover;
+					background-color: transparent;
+					&:hover {
+						background-color: rgba(255, 255, 255, 0.1);
+					}
+					.caret {
+						border-top-color: $navigation-color-hover;
+						border-bottom-color: $navigation-color-hover;
+					}
+				}
+			}
+		}
+
+		.mx-navbar-subitem {
+			&.active {
+				a {
+					color: $navigation-sub-color-active;
+					background-color: rgba(255, 255, 255, 0.1);
+					.caret {
+						border-top-color: $navigation-sub-color-active;
+						border-bottom-color: $navigation-sub-color-active;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+.mx-navbar .nav .mx-navbar-item {
+    &.active{
+      a{
+        font-weight: bold;
+        color: $text-button-tertiary-pressed;
+      }
+    }
+    a {
+
+    }
+  }

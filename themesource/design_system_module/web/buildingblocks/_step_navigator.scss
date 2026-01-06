@@ -1,0 +1,140 @@
+$point-size: 24px;
+
+%step-basics {
+    width: 24px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    &:focus-visible, &:focus{
+        outline: 0px;
+    }
+    &:hover {
+        .step_point_passed, .step_point_current, .step_point_future {
+            background-color: $default-secondary-bluestrong;
+            border-color: $default-secondary-bluestrong;
+            .step_point_dot_current{
+                background-color: $default-secondary-bluestrong;
+            }
+        }
+        .step_label_passed, .step_label_current, .step_label_future{
+            color: $default-secondary-bluestrong;
+        }
+        
+    }
+    &:focus, &:focus-visible {
+        .step_point_passed, .step_point_current, .step_point_future {
+            background-color: $default-secondary-bluestrong;
+            border-color: $default-secondary-bluestrong;
+            outline: 2px solid $border-focusoutline;
+            outline-offset: 2px;
+        }
+    }
+    &:active{
+        .step_point_passed, .step_point_current, .step_point_future{
+            background-color: $default-primary-deepblue;
+        }
+    }
+}
+
+%step-point-basics {
+    width: $point-size;
+    margin-left: auto;
+    margin-right: auto;
+    height: $point-size;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    z-index: 2; 
+}
+
+%step-line-basics {
+    height: 2px;
+    width: 100%;
+    margin: 12px -4px 0px;
+}
+
+%step-text-basics {
+    text-align: center;
+    font-size: $fontsize-xs;
+    width: fit-content;
+    white-space: nowrap;
+    margin-top: $spacing-inner-s;
+    translate: calc(-50% + 0.5 * $point-size);
+}
+
+.step_navigator {
+    width: 66%;
+    display: flex;
+    align-items: top;
+    margin-left: auto;
+    margin-right: auto;
+
+    .step_line_passed {
+        @extend %step-line-basics;
+        background-color: $icon-brand;
+    }
+
+    .step_line_future {
+        @extend %step-line-basics;
+        background-color: $border-strong;
+    }
+
+    .step_navigator_passed {
+        @extend %step-basics;
+
+       
+
+
+        .step_point_passed {
+            @extend %step-point-basics;
+            background-color: $icon-brand;
+            border-color: $icon-brand;
+
+            .mx-image-viewer-responsive {
+                color: $default-basic-white;
+                margin-top: -2px;
+                margin-left: 2.5px;
+
+            }
+
+        }
+
+        .step_label_passed {
+            @extend %step-text-basics;
+        }
+    }
+
+    .step_navigator_current {
+        @extend %step-basics;
+
+        .step_point_current {
+            @extend %step-point-basics;
+            background-color: $default-basic-white;
+            border: 2px solid $icon-brand;
+
+            .step_point_dot_current {
+                background-color: $icon-brand;
+                height: 100%;
+                border-radius: 50%;
+                border: 2px solid $default-basic-white;
+            }
+        }
+
+        .step_label_current {
+            @extend %step-text-basics;
+        }
+    }
+
+    .step_navigator_future {
+        @extend %step-basics;
+
+        .step_point_future {
+            @extend %step-point-basics;
+            background-color: $default-basic-white;
+            border: 1px solid $border-strong;
+        }
+
+        .step_label_future {
+            @extend %step-text-basics;
+        }
+    }
+}

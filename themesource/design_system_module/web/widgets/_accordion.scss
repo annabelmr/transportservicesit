@@ -1,0 +1,78 @@
+/*
+==========================================================================
+* Accordion widget
+==========================================================================
+*/
+
+
+.widget-accordion {
+  .widget-accordion-group {
+    border-color: $border-default;
+    .widget-accordion-group-header {
+      .widget-accordion-group-header-button {
+        color: $default-secondary-bluestrong;
+        padding: $spacing-inner-l 0;
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+          font-size: $font-size-h6;
+          font-family: $fontfamily-default;
+          font-weight: bold;
+          line-height: $lineheight-l;
+          letter-spacing: $letterspacing-l;
+          color: $default-secondary-bluestrong;
+          margin: 0px;
+        }
+        span {
+          color: $default-secondary-bluestrong;
+        }
+        .accordion-icon-header {
+          display: flex;
+          justify-content: start;
+          height: 24px;
+          & > .mx-image-viewer {
+            width: 24px;
+            margin-right: $spacing-outer-xs;
+          }
+        }
+        &.widget-accordion-group-header-button-clickable {
+          &:hover,
+          &:focus {
+            background-color: transparent;
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                text-decoration: underline;
+            }
+          }
+        }
+      }
+    }
+    .widget-accordion-group-content {
+      padding: 0 0 $spacing-inner-s;
+    }
+  }
+}
+
+/*
+==========================================================================
+* Design property for single accordion
+==========================================================================
+*/
+
+.widget-accordion.accordion-single {
+  .widget-accordion-group {
+    border-color: transparent;
+  }
+  .widget-accordion-group-header {
+    display: flex;
+  }
+  .widget-accordion-group-content {
+  }
+}

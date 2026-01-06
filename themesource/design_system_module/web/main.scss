@@ -1,0 +1,58 @@
+@import "../../../theme/web/custom-variables";
+@import "./variables";
+
+/* ==========================================================================
+  * Entry Point of Design System
+  ======================================================================== */
+
+// base
+@import "base/reset";
+@import "base/base";
+@import "base/helpers";
+@import "base/mixin";
+@import "base/typography";
+@import "base/flex";
+@import "base/login";
+@import "base/scrollbar";
+
+// widgets
+@import "widgets/layoutgrid";
+@import "widgets/buttons";
+@import "widgets/inputs";
+@import "widgets/datepicker";
+@import "widgets/datagrid";
+@import "widgets/listviews";
+@import "widgets/tabcontainer";
+@import "widgets/navigationbar";
+@import "widgets/navigationtree";
+@import "widgets/modal";
+@import "widgets/gallery";
+@import "widgets/accordion";
+@import "widgets/datagrid2";
+@import "widgets/progressbar";
+@import "widgets/filedropper";
+
+// custom widgets
+@import "./customwidgets/dropdownContainer";
+@import "./customwidgets/calender";
+
+// building blocks
+//@import "buildingblocks/sidebar";
+@import "buildingblocks/headers";
+@import "buildingblocks/avatars";
+@import "buildingblocks/breadcrumb";
+@import "buildingblocks/alerts";
+@import "buildingblocks/labels";
+@import "buildingblocks/card";
+@import "buildingblocks/card-annabel";
+@import "buildingblocks/step_navigator";
+@import "buildingblocks/card-anne";
+@import "buildingblocks/card-kasja";
+@import "buildingblocks/datagrid2";
+@import "buildingblocks/gallery_list_items";
+
+// layouts
+@import "layouts/layout-login";
+@import "layouts/layouts";
+@import "layouts/layouts-anne";
+@import "layouts/wizardfooter_layout";

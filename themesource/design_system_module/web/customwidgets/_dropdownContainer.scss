@@ -1,0 +1,99 @@
+/*
+==========================================================================
+* DropdownContainer Widget
+==========================================================================
+*/
+
+// Styling of the dropdown button + split variant
+.dropdown {
+  .btn-primary + .btn-primary {
+    border-left-color: $bg-color;
+  }
+
+  .dropdown-menu {
+    padding: $space-xxs 0;
+  }
+  // .btn-primary.active,
+  // .btn-primary.focus,
+  // .btn-primary:active,
+  // .btn-primary:focus,
+  // .btn-primary:hover,
+  // .open > .dropdown-toggle.btn-primary {
+  //   color: #fff;
+  //   background-color: $btn-primary-color;
+  //   border-color: #204d74;
+  // }
+}
+
+// Styling of the dropdown menu content when opened
+.dropdown-menu {
+  .btn {
+    text-align: left;
+    color: $default-secondary-bluestrong;
+    width: 100%;
+    background-color: transparent;
+    // border-radius: $border-radius-xxs;
+    border: none;
+    &:focus, &:focus-visible {
+      display: none;
+    }
+  }
+  .open > .dropdown-toggle.btn-primary {
+    background-color: red;
+  }
+  .mx-list {
+    li.mx-navigationlist-item {
+      border-bottom: none;
+      padding: 8px 16px;
+      border-left: 2px solid transparent;
+      &:hover{
+        background-color: $default-neutral-grey10;
+        border-left: 2px solid $default-primary-blue;
+      }
+      &:focus, &:focus-visible {
+        border: 2px solid $default-primary-deepblue;
+        background-color: transparent;
+      }
+    }
+}
+
+// Reset styling if the DropdownContainer Widget is positioned in a btn-toolbar.
+.btn-toolbar {
+  .dropdown-menu {
+    .btn {
+      margin-left: 0;
+    }
+  }
+
+  .btn-group {
+    margin-left: $space-xs;
+  }
+}
+
+// Reset styling if the DropdownContainer Widget is positioned in a header.
+.region-content-header {
+  .dropdown {
+    .row:not(:first-child) {
+      margin-top: 0;
+    }
+  }
+}
+}
+
+/*
+==========================================================================
+* Styling NavigationList within DropdownContainer
+==========================================================================
+*/
+
+// .mx-list {
+//   li.mx-navigationlist-item {
+//     border-bottom: none;
+//     padding: 8px 16px;
+//   }
+
+// //   .btn {
+// //     padding: 0;
+// //     background: transparent;
+// //   }
+// }

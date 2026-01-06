@@ -1,0 +1,127 @@
+
+.mx-calendar {
+    /* (must be higher than popup z-index) */
+    z-index: 10010;
+    padding: $spacing-inner-s;
+    background: $default-basic-white;
+    box-shadow: 0px 2px 6px 0px rgba(31, 30, 47, 0.15);
+    border-radius: $border-radius-xs;
+    th {
+        color: $default-basic-darkgrey;
+        font-size: $fontsize-xxs;
+        text-transform: lowercase;
+    }
+    th,
+    td {
+        width: 36px;
+        height: 36px;
+        text-align: center;
+    }
+    td {
+        &:hover {
+            outline: 1px solid $default-primary-blue;
+            border-radius: 0;
+            text-decoration: underline;
+        }
+        border: 1px solid $default-neutral-grey20;
+        outline: 1px solid transparent;
+        font-size: $fontsize-s;
+        color: $default-secondary-bluestrong;  
+       
+    }
+    
+}
+.mx-calendar-month-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0 3px 10px 3px;
+    color: $default-primary-blue;
+    .mx-calendar-month-dropdown {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        .mx-calendar-month-current:first-child {
+            margin-right: 10px;
+        }
+        .mx-calendar-month-dropdown-options {
+            /* (must be higher than popup z-index) */
+            z-index: 10020 !important;
+            position: absolute;
+            top: 25px;
+            padding: 0;
+            div {
+                cursor: pointer;
+                font-size: 12px;
+                padding: 0px $spacing-inner-s 0px;   
+                border: 1px solid transparent;       
+                &:hover,
+                &:focus {
+                    color: $brand-primary;
+                    border: 1px solid $default-primary-blue;
+                    border-radius: $border-radius-xs;
+                }
+            }
+        }
+    }
+    .mx-calendar-month-label{
+        color:$default-basic-darkgrey;
+        font-size: $fontsize-s;
+    }
+
+}
+table{
+    .mx-calendar-day-month-next,
+    .mx-calendar-day-month-previous {
+        color: $default-neutral-grey40;
+        opacity: 50%;
+    }
+    .mx-calendar-day-today{
+        background-color: $default-neutral-grey70;
+        border: 2px solid $default-neutral-grey70;
+        outline: 1px solid $default-neutral-grey40;
+        color: $default-basic-white;
+        &:hover{
+            background-color: $default-neutral-grey70;
+            border: 2px solid $default-neutral-grey70;
+            outline: 1px solid $default-primary-blue;
+            color: $default-basic-white;
+            text-decoration: none;
+        }
+    }
+    .mx-calendar-day-selected{
+        border-radius: 0;
+        background: none;
+        background-color: $default-basic-white;
+        border: 1px solid $default-primary-midorange;
+        outline: 1px solid $default-primary-midorange;
+    }
+    .mx-calendar-day-selected.mx-calendar-day-today{
+        background-color: $default-neutral-grey70;
+        border: 2px solid $default-neutral-grey70;
+        text-decoration: none;
+        outline: 1px solid $default-primary-midorange;
+    }
+}
+
+.mx-calendar-year-switcher{
+    text-align: center;
+    margin-top: 10px;
+    
+    span:hover {
+        cursor: pointer;
+        text-decoration: underline;
+        background-color: transparent;
+    }
+}
+.mx-calendar-year-selected,
+.mx-calendar-year-previous,
+.mx-calendar-year-next  {
+    color: $brand-primary;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+
+

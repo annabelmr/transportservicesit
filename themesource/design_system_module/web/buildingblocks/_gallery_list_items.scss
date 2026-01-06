@@ -1,0 +1,35 @@
+%basic-row-items{
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    font-size: $fontsize-xs;
+    background-color: $default-neutral-grey10;
+    border-radius: $border-radius-s;
+    color: $default-basic-darkgrey;
+    padding: $spacing-inner-l $spacing-inner-m $spacing-inner-l $spacing-inner-l;
+    &:hover {
+        border: 2px solid $border-selected;
+    }
+}
+
+.gallery-items{
+    width: 70%;
+    .widget-gallery-selected{
+        border: 2px solid $border-selected;
+        border-radius: $border-radius-s;
+    }
+    .row-items{
+        @extend %basic-row-items;
+        outline: 1px solid $border-fallback;
+        border: 1px solid transparent;
+        .row-item-header{
+            font-weight: 700;
+            padding-bottom: $spacing-inner-xxs;
+    
+        }
+        .row-item-details{ 
+            font-weight: 400;
+        }
+    }
+}

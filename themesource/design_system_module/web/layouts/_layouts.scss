@@ -1,0 +1,128 @@
+/*
+  ==========================================================================
+  * Layouts
+  ==========================================================================
+*/
+
+.region-topbar {
+  background: $topbar-bg;
+  color: $navtopbar-color;
+  padding-top: $space-sm;
+  padding-bottom: $space-sm;
+  padding-left: $space-md;
+  padding-right: $space-md;
+  //max-height: $topbar-height;
+  .mx-button {
+    color: $text-button-secondary-default;
+  }
+  // .app-name {
+  //   margin-left: $space-xs;
+  //   font-weight: 500;
+  //   text-overflow: ellipsis;
+  //   overflow: hidden;
+  //   white-space: nowrap;
+  //   @media (max-width: 1200px){
+  //     width: 8rem;
+  //   }
+  //   // font-size: 16px;
+  // }
+
+  .avatar-popup{
+    color: $topbar-nav-color;
+  }
+}
+
+.region-sidebar {
+  background: $gray-darker;
+}
+
+.region-header-content {
+  @extend %header;
+  background-color: $bg-color-secondary;
+
+  .main-page-container {
+    .mx-dataview-content {
+      padding-bottom: $spacing-inner-s !important; //! Temp fix
+    }
+  }
+
+  .mx-dataview-content {
+    height: auto !important;
+  }
+}
+
+.region-main-content {
+  .main-page-container {
+    padding-top: 0px;
+    &.mx-dataview > .mx-dataview-content {
+      padding-top: 0px;
+    }
+  }
+}
+
+.main-content {
+  background-color: $default-basic-white;
+  border-radius: $border-radius-m;
+  padding: $spacing-inner-xxl;
+}
+
+
+.region-footer-content {
+  width: 100%;
+  background-color: $default-basic-white;
+  border-top: 1px solid $border-default;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: $spacing-inner-m $spacing-inner-xl;
+}
+
+
+/*
+==========================================================================
+* @Media
+==========================================================================
+*/
+
+/*
+==========================================================================
+* Specific mendix atlas layout rules
+==========================================================================
+*/
+
+/*
+==========================================================================
+* Design property
+==========================================================================
+*/
+
+// For the 'Add page whitespace'-design property to give spacing based on spacing file to the outer-most scrollcontainer, dataview and layoutgrid element.
+.main-page-container {
+  @include layout-gutter-mixin();
+  padding-top: $space-xl;
+  padding-bottom: $space-xl;
+
+  &.mx-dataview {
+    padding: 0;
+
+    > .mx-dataview-content {
+      @include layout-gutter-mixin();
+      padding-top: $space-xl;
+      padding-bottom: $space-xl;
+    }
+  }
+
+  // Scrollcontainer as a main page container
+  &.mx-scrollcontainer {
+    padding: 0;
+
+    > div[class*="mx-scrollcontainer-"] {
+      @include layout-scrollcontainer-gutter-mixin();
+    }
+  }
+
+  &.mx-layoutgrid {
+    // true variable $isLayoutgrid
+    @include layout-gutter-mixin(true);
+  }
+}

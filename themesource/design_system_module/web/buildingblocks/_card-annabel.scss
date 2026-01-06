@@ -1,0 +1,45 @@
+%basic-card-styling {
+  border-radius: $border-radius-s;
+  .card-content {
+    padding: $spacing-inner-xl;
+    color: $default-basic-darkgrey;
+    .card-illustration {
+      width: 9rem;
+      height: 9rem;
+    }
+    .card-title {
+      font-size: $fontsize-l;
+    }
+    .card-text {
+      font-size: $fontsize-xs;
+    }
+  }
+  .card-footer {
+        border-bottom-left-radius: $border-radius-s;
+        border-bottom-right-radius: $border-radius-s;
+    .card-footer-link {
+      font-size: $fontsize-xs;
+      padding: $spacing-inner-xl;
+      color: $default-secondary-bluestrong;
+    }
+  }
+}
+
+.postnl-card-default-small-annabel {
+  @extend %basic-card-styling;
+  background-color: $default-neutral-grey10;
+  .card-footer {
+    background-color: $default-neutral-grey20;
+  }
+}
+
+.postnl-card-inverse-small-annabel {
+  @extend %basic-card-styling;
+  background-color: $default-basic-white;
+  .card-title {
+    color: $default-primary-midorange;
+  }
+  .card-footer {
+    border-top: solid 1px $border-default;
+  }
+}

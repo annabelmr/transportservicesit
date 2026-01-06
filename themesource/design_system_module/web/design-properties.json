@@ -1,0 +1,171 @@
+{
+  "DataView": [
+    {
+      "name": "Add page whitespace",
+      "oldNames": ["Main dataview", "Add spacing around"],
+      "type": "Toggle",
+      "description": "Add page whitespace to this element.",
+      "class": "main-page-container"
+    },
+    {
+      "name": "# Main content-card",
+      "type": "Toggle",
+      "description": "Add card with padding, whitebackground and rounded corners for main content",
+      "class": "main-content"
+    }
+  ],
+  "DivContainer": [
+    {
+      "name": "# Main content-card",
+      "type": "Toggle",
+      "description": "Add card with padding, whitebackground and rounded corners for main content",
+      "class": "main-content"
+    }
+  ],
+  "LayoutGrid": [
+    {
+      "name": "Add page whitespace",
+      "oldNames": ["Main layoutgrid", "Add spacing around"],
+      "type": "Toggle",
+      "description": "Add page whitespace to this element.",
+      "class": "main-page-container"
+    },
+    {
+      "name": "# Main content-card",
+      "type": "Toggle",
+      "description": "Add card with padding, whitebackground and rounded corners for main content",
+      "class": "main-content"
+    }
+  ],
+  "LayoutGridColumn": [
+    {
+      "name": "Remove horizontal spacing",
+      "oldNames": ["Remove side gutter in column", "Remove spacing"],
+      "type": "Dropdown",
+      "description": "Remove the left, right or both spacing of this element. Note: might trigger scrollbars.",
+      "options": [
+        {
+          "name": "Left side",
+          "class": "layoutgrid-column-no-padding-left"
+        },
+        {
+          "name": "Right side",
+          "class": "layoutgrid-column-no-padding-right"
+        },
+        {
+          "name": "Both",
+          "class": "layoutgrid-no-side"
+        }
+      ]
+    }
+  ],
+  "Button": [
+    {
+      "name": "Icon only",
+      "type": "Toggle",
+      "description": "Button shows only an icon.",
+      "class": "btn-icon-only"
+    }
+  ],
+  "TextBox": [
+    {
+      "name": "add 'optional' text",
+      "type": "Toggle",
+      "description": "add an optional text to an input",
+      "class": "input-optional"
+    }
+  ],
+  "TextArea": [
+    {
+      "name": "Add 'optional' text",
+      "type": "Toggle",
+      "description": "add an optional text to an input",
+      "class": "input-optional"
+    }
+  ],
+  "DropDown": [
+    {
+      "name": "add 'optional' text",
+      "type": "Toggle",
+      "description": "add an optional text to an input",
+      "class": "input-optional"
+    }
+  ],
+  "CheckBox": [
+    {
+      "name": "add 'optional' text",
+      "type": "Toggle",
+      "description": "add an optional text to an input",
+      "class": "input-optional"
+    }
+  ],
+  "RadioButtonGroup": [
+    {
+      "name": "add 'optional' text",
+      "type": "Toggle",
+      "description": "add an optional text to an input",
+      "class": "input-optional"
+    }
+  ],
+  "DatePicker": [
+    {
+      "name": "Add 'optional' text",
+      "type": "Toggle",
+      "description": "add an optional text to an input",
+      "class": "input-optional"
+    }
+  ],
+  "ReferenceSelector": [
+    {
+      "name": "Add 'optional' text",
+      "type": "Toggle",
+      "description": "add an optional text to an input",
+      "class": "input-optional"
+    }
+  ],
+  "ReferenceSetSelector": [
+    {
+      "name": "Add 'optional' text",
+      "type": "Toggle",
+      "description": "add an optional text to an input",
+      "class": "input-optional"
+    }
+  ],
+  "InputReferenceSetSelector": [
+    {
+      "name": "Add 'optional' text",
+      "type": "Toggle",
+      "description": "add an optional text to an input",
+      "class": "input-optional"
+    }
+  ],
+  "com.mendix.widget.web.accordion.Accordion": [
+    {
+      "name": "# Single collapsible",
+      "type": "Toggle",
+      "description": "Make the accordion a single collapsible",
+      "class": "accordion-single"
+    }
+  ],
+  "DynamicText": [
+    {
+        "name": "# Subheader",
+        "type": "ToggleButtonGroup",
+        "description": "Choose if the text is a subheader.",
+        "options": [
+            {
+                "name": "Small",
+                "class": "subtitle-s"
+            },
+            {
+                "name": "Medium",
+                "class": "subtitle-m"
+            },
+            {
+                "name": "Large",
+                "class": "subtitle-l"
+            }
+        ]
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+// Customize the default Mendix generated progressbar --------------------------
+.mx-progress {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+    display: flex;
+    flex-direction: column-reverse;
+    left: 50%;
+    padding: 0 4px;
+    right: auto;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+  
+    .mx-progress-indicator {
+      background-color: transparent;
+      background-image: url('img/Design_System_Module$POSTNL_Images$bus_spinner.gif');
+      background-position: center;
+      background-repeat: no-repeat;
+      border-radius: 8px 8px 0 0;
+      height: 150px;
+      width: 150px;
+      &::before, &::after {display: none;}
+    }
+  
+    &.mx-progress-empty {
+      .mx-progress-message::before {
+        content: '';
+        margin: 0;
+      }
+    }
+  
+    .mx-progress-message {
+      color: black;
+      display: block;
+      font-weight: bold;
+      opacity: 0.42;
+      margin: 0;
+      margin-block-end: 8px;
+    }
+  }
+  
+  // Language specific text
+  html[lang="nl-nl"] .mx-progress-empty .mx-progress-message::before {
+    content: 'Aan het laden...';
+  }
+  
+  html[lang="en-us"] .mx-progress-empty .mx-progress-message::before {
+    content: 'Loading...';
+  }
+ 
+  
+  // .mx-listview > ul > li.mx-listview-empty {
+  //   &:lang(nl)::before {content: '';}
+  //   &:lang(en)::before {content: '';}
+  // }
+  
+  
+  // mx-progress structure:
+  
+  // <div class="mx-progress mx-progress-empty">
+  //   <div class="mx-progress-message"></div>
+  //   <div class="mx-progress-indicator"></div>
+  // </div>
+  

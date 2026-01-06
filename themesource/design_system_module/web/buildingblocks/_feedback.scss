@@ -1,0 +1,93 @@
+/*
+==========================================================================
+*   Feedback - The default feedback boxes in different styles
+==========================================================================
+*/
+
+// Default small feedback box (no colors definitions)
+.box {
+	display: flex;
+	align-items: center;
+	border: 1px solid transparent;
+	padding: $space-sm $space-sm + $space-xxs;
+	border-radius: $border-radius-default;
+	min-height: 58px;
+
+	.mx-image {
+		margin-right: $space-base-unit + $space-xxs;
+	}
+
+	h5 {
+		font-weight: 600;
+		margin-top: unset;
+	}
+
+	.heading-bullet-list {
+		margin-top: calc(#{$space-xxs} / 2);
+	}
+
+	.mx-text {
+		margin-bottom: unset;
+
+		& + .mx-text {
+			margin-left: $space-xxs;
+		}
+	}
+
+	.bullet-list {
+		.mx-text + .mx-text {
+			margin-left: unset;
+		}
+	}
+
+	.btn-toolbar {
+		margin-left: auto;
+	}
+
+	.btn-close {
+		color: $gray-darkest;
+	}
+}
+
+/*
+==========================================================================
+*   Type of boxes (color definitions)
+==========================================================================
+*/
+
+.info-box {
+	background-color: percentage-of-color($brand-primary, 10%);
+	border-color: percentage-of-color($brand-primary, 20%);
+}
+
+.success-box {
+	background-color: percentage-of-color($brand-success, 10%);
+	border-color: percentage-of-color($brand-success, 20%);
+}
+
+.warning-box {
+	background-color: percentage-of-color($brand-warning, 10%);
+	border-color: percentage-of-color($brand-warning, 20%);
+}
+
+.danger-box {
+	background-color: percentage-of-color($brand-danger, 10%);
+	border-color: percentage-of-color($brand-danger, 20%);
+}
+
+/*
+==========================================================================
+*   Placement of boxes
+==========================================================================
+*/
+.region-content-header {
+	.box {
+		border-radius: 0;
+		border-left: none;
+		border-right: none;
+
+		p {
+			margin-top: 0;
+		}
+	}
+}
