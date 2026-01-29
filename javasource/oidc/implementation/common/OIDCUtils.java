@@ -13,7 +13,7 @@ import java.util.List;
 public class OIDCUtils {
 
     public static long getCacheUpdatedTime(IContext context) {
-        List<IMendixObject> list = MendixUtils.retrieveFromDatabase(context, "//%s",   new HashMap<>(),CacheMetadata.getType());
+        List<IMendixObject> list = MendixDataStorageUtils.retrieveFromDatabase(context, "//%s",   new HashMap<>(),CacheMetadata.getType());
         if (!list.isEmpty()) {
             return CacheMetadata.initialize(context, list.stream().findFirst().get()).getCacheUpdateTime();
         }
@@ -21,7 +21,7 @@ public class OIDCUtils {
     }
 
     public static List<IMendixObject> getPrivateKeySSOConfig(IContext context) {
-        List<IMendixObject> list = MendixUtils.retrieveFromDatabase(context, "//%s[%s = true() and %s = $ClientAssertion]",  new HashMap<>() {{
+        List<IMendixObject> list = MendixDataStorageUtils.retrieveFromDatabase(context, "//%s[%s = true() and %s = $ClientAssertion]",  new HashMap<>() {{
                     put("ClientAssertion", ENU_ClientAssertion.PRIVATE_KEY.name());
                 }},
                 ClientConfiguration.getType(),

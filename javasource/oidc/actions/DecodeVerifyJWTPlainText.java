@@ -14,6 +14,7 @@ import com.mendix.systemwideinterfaces.core.UserAction;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
 import oidc.implementation.common.JWTValidator;
+import org.apache.commons.lang3.StringUtils;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
@@ -51,17 +52,14 @@ public class DecodeVerifyJWTPlainText extends UserAction<java.lang.String>
 	public java.lang.String executeAction() throws Exception
 	{
 		// BEGIN USER CODE
-        //Get the Key ID from the token
-
         validateInputs();
         int maxClockSkew = 0; // Default value for max clock skew, can be adjusted as needed
         if (this.leeway != null && this.leeway.intValue() > 0) {
             maxClockSkew = this.leeway.intValue(); // Default to 0 if leeway is not provided
         }
-        final String audianceSetStr = Optional.of(this.audience).orElse(null);
-        Set<String> audianceSet = audianceSetStr.isEmpty() ? null : new HashSet<>(Arrays.asList(audianceSetStr.split(",")));
-        final JWTClaimsSet claimsSet = JWTValidator.validate(this.encodedJWT, this.issuer, audianceSet, this.jwksUri, maxClockSkew);
-        return JSONObjectUtils.toJSONString(claimsSet.getClaims());
+        Set<String> audienceSet = StringUtils.isNotBlank(this.audience) ? new HashSet<>(Arrays.asList(this.audience.split(","))) : null;
+        final JWTClaimsSet claimsSet = JWTValidator.validate(this.encodedJWT, this.issuer, audienceSet, this.jwksUri, maxClockSkew);
+        return JSONObjectUtils.toJSONString(claimsSet.toJSONObject(true));
 		// END USER CODE
 	}
 

@@ -14,8 +14,9 @@ import com.mendix.logging.ILogNode;
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
 import com.mendix.systemwideinterfaces.core.UserAction;
-import oidc.implementation.common.TokenUtils;
+import com.nimbusds.jose.util.JSONObjectUtils;
 import usercommons.proxies.UserClaim;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class CreateClaimsWithJSON extends UserAction<java.util.List<IMendixObject>>
@@ -35,28 +36,24 @@ public class CreateClaimsWithJSON extends UserAction<java.util.List<IMendixObjec
 	public java.util.List<IMendixObject> executeAction() throws Exception
 	{
 		// BEGIN USER CODE
+        Map<String, Object> jsonObjectMap = JSONObjectUtils.parse(this.OpenIDTokenJSON);
 
-        final Map<String, Object> jsonObjectMap = TokenUtils.parseJWTFromString(this.OpenIDTokenJSON).getJWTClaimsSet().getClaims();
-        java.util.List<IMendixObject> userClaims = new java.util.ArrayList<>();
-        if (jsonObjectMap != null && !jsonObjectMap.isEmpty()) {
-            // Extract field names from the JSON object
-
-            // Iterate over the field names and create UserClaim objects
-            for (Map.Entry<String, Object> entry : jsonObjectMap.entrySet()) {
-                UserClaim userClaim = new UserClaim(getContext()); //Core.instantiate(context, UserClaim.getType());
-                userClaim.setName(entry.getKey());
-
-                Object obj = entry.getValue();
-                if (obj != null) {
-                    String value = String.valueOf(obj);
-                    userClaim.setValue(value);
-                    userClaims.add(userClaim.getMendixObject());
-                }
-            }
-        } else {
-            logNode.info("The provided OpenID Token JSON is empty or null.");
+        if (jsonObjectMap == null || jsonObjectMap.isEmpty()) {
+            log.info("The provided OpenID Token JSON is empty or null.");
+            return new ArrayList<>();
         }
-        return userClaims;
+
+        return jsonObjectMap.entrySet().stream()
+                .map(entry -> {
+                    UserClaim userClaim = new UserClaim(getContext());
+                    userClaim.setName(entry.getKey());
+
+                    Object value = entry.getValue();
+                    if (value != null) {
+                        userClaim.setValue(String.valueOf(value));
+                    }
+                    return userClaim.getMendixObject();
+                }).toList();
 		// END USER CODE
 	}
 
@@ -71,6 +68,6 @@ public class CreateClaimsWithJSON extends UserAction<java.util.List<IMendixObjec
 	}
 
 	// BEGIN EXTRA CODE
-    private static final ILogNode logNode = Core.getLogger("oidc.actions.CreateClaimsWithJSON");
+    private static final ILogNode log = Core.getLogger(CreateClaimsWithJSON.class.getName());
 	// END EXTRA CODE
 }

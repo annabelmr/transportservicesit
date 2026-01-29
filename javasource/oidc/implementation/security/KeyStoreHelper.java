@@ -19,6 +19,8 @@ import java.security.KeyStoreException;
 
 
 public class KeyStoreHelper {
+
+    private final int KEY_STORE_PASSWORD_SIZE = 16;
     private final IContext context;
     private static final ILogNode _logNode = Core.getLogger(Constants.LOG_NODE);
     public KeyStoreHelper(IContext context){
@@ -35,7 +37,7 @@ public class KeyStoreHelper {
             Core.commit(context,KeyStore.getMendixObject());
             }
 
-            String password = StringUtils.randomString(Constants.KEY_STORE_PASSWORD_SIZE);
+            String password = StringUtils.randomString(KEY_STORE_PASSWORD_SIZE);
             String alias = StringUtils.randomHash();
             IMendixObject keyStoreObj =   createKeyStoreEntity(ClientConfiguration,alias,password);
             KeyStore  ks = securityHelper.generateKeyStore(alias,password,ClientConfiguration.getJWT_Sign_Algorithm().name(),ClientConfiguration.getKeyPair_ExpirationDays());

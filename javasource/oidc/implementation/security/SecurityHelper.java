@@ -25,18 +25,33 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Date;
+
 public class SecurityHelper {
-
-    private static final String ALG_START_WITH_ES = "ES";
-    private static final String ALG_START_WITH_PS = "PS";
-    private static final String ALG_END_WITH_384 = "384";
-    private static final String ALG_END_WITH_512 = "512";
-    public static final String PROVIDER = "BC";
-    public static final String JKS = "JKS";
-    public static final String PKCS_12 = "PKCS12";
-    private static final ILogNode _logNode = Core.getLogger(Constants.LOG_NODE);
-    public SecurityHelper(){}
-
+    private final String ALG_START_WITH_ES = "ES";
+    private final String ALG_START_WITH_PS = "PS";
+    private final String ALG_END_WITH_384 = "384";
+    private final String ALG_END_WITH_512 = "512";
+    private final String PROVIDER = "BC";
+    private final String JKS = "JKS";
+    private final String PKCS_12 = "PKCS12";
+    private final String RS_KEY_ALG = "RSA";
+    private final String ES_KEY_ALG = "EC";
+    private final int ALG_256_KEY_SIZE = 2048;
+    private final int ALG_384_KEY_SIZE = 3072;
+    private final int ALG_512_KEY_SIZE = 4096;
+    private final String RS256_SIGN_ALGORITHM = "SHA256withRSA";
+    private final String RS384_SIGN_ALGORITHM = "SHA384withRSA";
+    private final String RS512_SIGN_ALGORITHM = "SHA512withRSA";
+    private final String PS256_SIGN_ALGORITHM = "SHA256withRSAandMGF1";
+    private final String PS384_SIGN_ALGORITHM = "SHA384withRSAandMGF1";
+    private final String PS512_SIGN_ALGORITHM = "SHA512withRSAandMGF1";
+    private final String ES256_SIGN_ALGORITHM = "SHA256withECDSA";
+    private final String ES256_GEN_PARAMETER_SPEC = "secp256r1";
+    private final String ES384_SIGN_ALGORITHM = "SHA384withECDSA";
+    private final String ES384_GEN_PARAMETER_SPEC = "secp384r1";
+    private final String ES512_SIGN_ALGORITHM = "SHA512withECDSA";
+    private final String ES512_GEN_PARAMETER_SPEC = "secp521r1";
+    private final ILogNode LOG = Core.getLogger(Constants.LOG_NODE);
 
     public  KeyStore generateKeyStore(String alias,String password,String algo,long keyPairExpirationDays) throws CoreException {
         try{
@@ -49,13 +64,12 @@ public class SecurityHelper {
             X509Certificate certificate = generateCertificate(keyPair,algInfo,keyPairExpirationDays);
             return storeInKeystore(getFile(alias),password,alias,keyPair.getPrivate(),certificate);
         }catch (Exception ex){
-            _logNode.error("Unable to generate credential:", ex);
+            LOG.error("Unable to generate credential:", ex);
             throw  new CoreException("Unable to generate credential");
         }
 
 
     }
-
 
     public  KeyStore getKeyStore(IMendixObject keyStoreObj,String password,String alg, IContext context) throws CoreException {
         try {
@@ -70,7 +84,7 @@ public class SecurityHelper {
             }
             return ks;
         }catch (Exception e){
-             _logNode.error("Unable to read credential:", e);
+             LOG.error("Unable to read credential:", e);
              throw new CoreException("Unable to read credential");
         }
 
@@ -106,38 +120,38 @@ public class SecurityHelper {
 
 
     private  KeyStoreAlgInfo getKeyStoreAlgInfo(String algo){
-        String keyAlgorithm = Constants.RS_KEY_ALG;
-        String  signAlgorithm= Constants.RS256_SIGN_ALGORITHM;
-        int keySize = Constants.ALG_256_KEY_SIZE;
+        String keyAlgorithm = RS_KEY_ALG;
+        String  signAlgorithm= RS256_SIGN_ALGORITHM;
+        int keySize = ALG_256_KEY_SIZE;
         String genParameterSpec="";
         boolean isECAlg = false,isPSAlg=false;
         if(algo.startsWith(ALG_START_WITH_ES)){
-            keyAlgorithm = Constants.ES_KEY_ALG;
-            signAlgorithm= Constants.ES256_SIGN_ALGORITHM;
+            keyAlgorithm = ES_KEY_ALG;
+            signAlgorithm= ES256_SIGN_ALGORITHM;
             isECAlg = true;
-            genParameterSpec = Constants.ES256_GEN_PARAMETER_SPEC;
+            genParameterSpec = ES256_GEN_PARAMETER_SPEC;
         } else if (algo.startsWith(ALG_START_WITH_PS)){
             isPSAlg = true;
-            signAlgorithm= Constants.PS256_SIGN_ALGORITHM;
+            signAlgorithm= PS256_SIGN_ALGORITHM;
         }
         if(algo.endsWith(ALG_END_WITH_384)){
-            keySize = Constants.ALG_384_KEY_SIZE;
-            signAlgorithm= Constants.RS384_SIGN_ALGORITHM;
+            keySize = ALG_384_KEY_SIZE;
+            signAlgorithm= RS384_SIGN_ALGORITHM;
             if(isECAlg){
-                signAlgorithm= Constants.ES384_SIGN_ALGORITHM;
-                genParameterSpec = Constants.ES384_GEN_PARAMETER_SPEC;
+                signAlgorithm= ES384_SIGN_ALGORITHM;
+                genParameterSpec = ES384_GEN_PARAMETER_SPEC;
             } else if (isPSAlg) {
-                signAlgorithm= Constants.PS384_SIGN_ALGORITHM;
+                signAlgorithm= PS384_SIGN_ALGORITHM;
             }
 
         } else if(algo.endsWith(ALG_END_WITH_512)){
-            keySize = Constants.ALG_512_KEY_SIZE;
-            signAlgorithm= Constants.RS512_SIGN_ALGORITHM;
+            keySize = ALG_512_KEY_SIZE;
+            signAlgorithm= RS512_SIGN_ALGORITHM;
             if(isECAlg){
-                signAlgorithm= Constants.ES512_SIGN_ALGORITHM ;
-                genParameterSpec = Constants.ES512_GEN_PARAMETER_SPEC ;
+                signAlgorithm= ES512_SIGN_ALGORITHM ;
+                genParameterSpec = ES512_GEN_PARAMETER_SPEC ;
             } else if (isPSAlg) {
-                signAlgorithm= Constants.PS512_SIGN_ALGORITHM;
+                signAlgorithm= PS512_SIGN_ALGORITHM;
             }
         }
         return new KeyStoreAlgInfo(keyAlgorithm,keySize,signAlgorithm,isECAlg,genParameterSpec);
@@ -154,7 +168,7 @@ public class SecurityHelper {
             //Generate Keypair for RS512,RS256, RS384,PS256, PS384, or PS512 Alg
             keyGenerator.initialize(algoIfo.getKeySize());
         }
-        _logNode.debug("new key pair generated ");
+        LOG.debug("new key pair generated ");
         return keyGenerator.generateKeyPair();
 
     }
@@ -185,7 +199,7 @@ public class SecurityHelper {
         try (FileOutputStream fos = new FileOutputStream(keystorePath)) {
             keyStore.store(fos, keystorePassword.toCharArray());
         }
-        _logNode.debug("saved java Key Store");
+        LOG.debug("saved java Key Store");
         return keyStore;
     }
 
@@ -194,7 +208,7 @@ public class SecurityHelper {
         File keystoreFile = getFile(alias);
         if (keystoreFile.exists()) {
             if(!keystoreFile.delete()){
-                _logNode.warn(String.format("Unable to delete the %s file:",keystoreFile.getName()));
+                LOG.warn(String.format("Unable to delete the %s file:",keystoreFile.getName()));
             }
         }
         return keystoreFile;

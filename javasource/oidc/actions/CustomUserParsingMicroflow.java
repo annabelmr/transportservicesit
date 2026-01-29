@@ -42,7 +42,7 @@ public class CustomUserParsingMicroflow extends UserAction<IMendixObject>
 	{
 		// BEGIN USER CODE
 		IContext context=getContext();
-		IMendixObject resultObject = (IMendixObject) Core.microflowCall(Microflow)
+		IMendixObject resultObject = Core.microflowCall(Microflow)
                 .withParam("OAuthToken", Token.getMendixObject())
                 .withParam("OpenIDTokenJSON", OpenIDTokenJSON)
                 .execute(context);

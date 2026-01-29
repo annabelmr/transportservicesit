@@ -9,6 +9,8 @@
 
 package oidc.actions;
 
+import com.mendix.core.Core;
+import com.mendix.logging.ILogNode;
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
 import com.mendix.systemwideinterfaces.core.UserAction;
@@ -47,17 +49,24 @@ public class AzureRoleParse extends UserAction<java.util.List<IMendixObject>>
 	public java.util.List<IMendixObject> executeAction() throws Exception
 	{
 		// BEGIN USER CODE
-
-        final List<Role> idpUserRoles = RoleAssignmentUtil.getIdpRolesFromToken(getContext(), this.AccessToken, this.ClaimName);
-        final List<IMendixObject> filteredList = this.MendixUserRoleList.stream().filter(
-                mendixUserRole -> idpUserRoles.stream().anyMatch(
-                        idpUserRole -> mendixUserRole.getName().equals(idpUserRole.getRoleName()) || mendixUserRole.getModelGUID().equals(idpUserRole.getRoleName())
-                )).map(userRole -> {
-            Role role = new Role(getContext());
-            role.setRoleName(userRole.getModelGUID());
-            return role;
-        }).map(Role::getMendixObject).toList();
-        return filteredList;
+		if (this.AccessToken == null || this.AccessToken.trim().isEmpty()) {
+			logNode.info("Access token is missing or null.");
+			return java.util.Collections.emptyList();
+		}
+		if (this.MendixUserRoleList.isEmpty()) {
+			logNode.info("Mendix user role list is missing or empty.");
+			return java.util.Collections.emptyList();
+		}
+		final List<Role> idpUserRoles = RoleAssignmentUtil.getIdpRolesFromToken(getContext(), this.AccessToken, this.ClaimName);
+		final List<IMendixObject> filteredList = this.MendixUserRoleList.stream().filter(
+				mendixUserRole -> idpUserRoles.stream().anyMatch(
+						idpUserRole -> mendixUserRole.getName().equals(idpUserRole.getRoleName()) || mendixUserRole.getModelGUID().equals(idpUserRole.getRoleName())
+				)).map(userRole -> {
+			Role role = new Role(getContext());
+			role.setRoleName(userRole.getModelGUID());
+			return role;
+		}).map(Role::getMendixObject).toList();
+		return filteredList;
 		// END USER CODE
 	}
 
@@ -72,5 +81,6 @@ public class AzureRoleParse extends UserAction<java.util.List<IMendixObject>>
 	}
 
 	// BEGIN EXTRA CODE
+	private static final ILogNode logNode = Core.getLogger("oidc.actions.AzureRoleParse");
 	// END EXTRA CODE
 }
