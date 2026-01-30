@@ -29,7 +29,6 @@ import com.mendix.systemwideinterfaces.connectionbus.requests.types.IOQLTextGetR
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixIdentifier;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
-import com.mendix.webui.CustomJavaAction;
 import com.opencsv.CSVWriter;
 import csv.impl.CSV;
 import oql.implementation.OQL;

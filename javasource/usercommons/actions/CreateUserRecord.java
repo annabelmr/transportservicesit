@@ -9,12 +9,7 @@
 
 package usercommons.actions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 import com.mendix.core.Core;
 import com.mendix.core.CoreException;
 import com.mendix.logging.ILogNode;
@@ -34,6 +29,11 @@ import usercommons.implementation.common.MendixUtils;
 import usercommons.implementation.common.RandomPasswordGenerator;
 import usercommons.implementation.exception.UserCommonsException;
 import com.mendix.systemwideinterfaces.core.UserAction;
+import usercommons.proxies.Claim;
+import usercommons.proxies.ClaimEntityAttribute;
+import usercommons.proxies.UserClaim;
+import usercommons.proxies.UserProvisioning;
+import usercommons.proxies.microflows.Microflows;
 
 public class CreateUserRecord extends UserAction<IMendixObject>
 {
@@ -85,45 +85,36 @@ public class CreateUserRecord extends UserAction<IMendixObject>
 	public IMendixObject executeAction() throws Exception
 	{
 		// BEGIN USER CODE
-		ILogNode LOG = Core.getLogger("UserCommons");
-		LOG.info("Started user creation");
-		String userEntityName = getUserEntityName();
-		String userPrincipalMemberName = getUserPrincipalAttribute();
-		IMendixObject defaultUserRoleObject = getUserRole();
-		usercommons.proxies.ClaimEntityAttribute principalConfigEntityAttribute = getPrincipalConfigEntityAttribute(
-				userPrincipalMemberName);
-		if (principalConfigEntityAttribute == null) {
-			LOG.error("Map Principal attribute to any one of attribute of userclaims: " + userPrincipalMemberName);
-			throw new UserCommonsException(
-					"Map Principal attribute to any one of attribute of userclaims: " + userPrincipalMemberName);
-		}
-		Map<String, usercommons.proxies.UserClaim> ClaimsMap = new HashMap<>();
-		this.Claims.forEach(claims -> {
-			ClaimsMap.put(claims.getName(), claims);
-		});
-		if (!this.UserProvisioning.getAllowCreateUsers()) {
-			LOG.warn(
-					"User creation is currently disabled due to the inactive status of the 'Allow module to Create users' setting in the Configuration. Please enable this setting to proceed with user creation");
-		}
-		String UserPrincipalClaimValue = getUserPrincipalClaimValue(principalConfigEntityAttribute, ClaimsMap);
-		IMendixObject mxUser = getUserObject(userEntityName, userPrincipalMemberName, defaultUserRoleObject,
-				UserPrincipalClaimValue);
-		updateUserInfo(ClaimsMap, userPrincipalMemberName, mxUser);
-		setLanguageAndTimeZone(mxUser);
+        log.info("Started user creation");
+        final String userEntityName = getUserEntityName();
+        final String userPrincipalMemberName = getUserPrincipalAttribute();
+        final IMendixObject defaultUserRoleObject = getUserRole();
 
-		// Commit the user object
-		try {
-			Core.commit(getContext(), mxUser);
-			createOrUpdateUserReportInfo(mxUser);
-			handleCustomProvisioning(mxUser);
-			LOG.info("User Saved Successfully");
+        final ClaimEntityAttribute principalConfigEntityAttribute = getPrincipalConfigEntityAttribute(userPrincipalMemberName);
+        final Map<String, UserClaim> claimsMap = getUserClaimMap();
 
-		} catch (RuntimeException e) {
-			LOG.error("An error occured while trying to commit the user entity :" + UserPrincipalClaimValue);
-			throw new UserCommonsException("An error occured while trying to commit the user entity.", e);
-		}
+        if (!this.UserProvisioning.getAllowCreateUsers()) {
+            log.warn(
+                    "User creation is currently disabled due to the inactive status of the 'Allow module to Create users' setting in the Configuration. Please enable this setting to proceed with user creation");
+        }
 
-		return mxUser;
+        final String userPrincipalClaimValue = getUserPrincipalClaimValue(principalConfigEntityAttribute, claimsMap);
+        final IMendixObject mendixObjectUser = getOrCreateUserMendixObject(userEntityName, userPrincipalMemberName, defaultUserRoleObject, userPrincipalClaimValue);
+        updateUserInfo(claimsMap, userPrincipalMemberName, mendixObjectUser);
+        setLanguageAndTimeZone(mendixObjectUser);
+
+        try {
+            Core.commit(getContext(), mendixObjectUser);
+            createOrUpdateUserReportInfo(mendixObjectUser);
+            handleCustomProvisioning(mendixObjectUser);
+            log.info("User Saved Successfully");
+
+        } catch (RuntimeException e) {
+            log.error("An error occured while trying to commit the user entity :" + userPrincipalClaimValue);
+            throw new UserCommonsException("An error occured while trying to commit the user entity.", e);
+        }
+
+        return mendixObjectUser;
 		// END USER CODE
 	}
 
@@ -138,321 +129,348 @@ public class CreateUserRecord extends UserAction<IMendixObject>
 	}
 
 	// BEGIN EXTRA CODE
-	/**
-	 * Retrieve the entity type for the user
-	 */
-	private String getUserEntityName() throws UserCommonsException, com.mendix.core.CoreException {
-		ILogNode LOG = Core.getLogger("UserCommons");
-		String CustomEntity = this.UserProvisioning.getCustomEntity();
-		if (CustomEntity != null) {
-			return CustomEntity;
-		}
-		LOG.error("CustomUserEntity not configured");
-		throw new UserCommonsException("CustomUserEntity not configured");
-	}
 
-	/**
-	 * Retrieve the username attribute used for principal name comparison
-	 */
-	private String getUserPrincipalAttribute() throws UserCommonsException, com.mendix.core.CoreException {
-		ILogNode LOG = Core.getLogger("UserCommons");
-		String CustomEntityMember = this.UserProvisioning.getCustomEntityMember();
-		if (CustomEntityMember != null) {
-			return CustomEntityMember;
-		}
-		LOG.error("userPrincipleMemberName not configured");
-		throw new UserCommonsException("userPrincipleMemberName not configured");
-	}
+    private final ILogNode log = Core.getLogger("UserCommons");
 
-	/**
-	 * Retrieve the user role to map to the created user
-	 */
-	private IMendixObject getUserRole() throws com.mendix.core.CoreException {
-		UserRole role = this.UserProvisioning.getUserProvisioning_UserRole();
-		IMendixObject defaultUserRoleObject = null;
-		if (role != null)
-			defaultUserRoleObject = role.getMendixObject();
-		return defaultUserRoleObject;
-	}
+    private Map<String, UserClaim> getUserClaimMap() {
+        Map<String, UserClaim> claimsMap = new HashMap<>();
+        this.Claims.forEach(userClaim -> {
+            claimsMap.put(userClaim.getName(), userClaim);
+        });
+        return claimsMap;
+    }
 
-	/**
-	 * Retrieve the configuration entity attribute for the user principal member
-	 * name
-	 */
-	private usercommons.proxies.ClaimEntityAttribute getPrincipalConfigEntityAttribute(
-			final String finalUserPrincipleMemberName) {
-		return ConfigEntityAttributesList.stream().filter(configEntityAttributes -> {
-			return configEntityAttributes.getEntityMemberName().equals(finalUserPrincipleMemberName);
-		}).findFirst().orElse(null);
-	}
+    /**
+     * Retrieve the entity type for the user
+     */
+    private String getUserEntityName() throws UserCommonsException {
+        String CustomEntity = this.UserProvisioning.getCustomEntity();
+        if (CustomEntity != null) {
+            return CustomEntity;
+        }
+        log.error("CustomUserEntity not configured");
+        throw new UserCommonsException("CustomUserEntity not configured");
+    }
 
-	/**
-	 * Retrieve the user principal claim value
-	 */
-	private String getUserPrincipalClaimValue(usercommons.proxies.ClaimEntityAttribute principalConfigEntityAttribute,
-			Map<String, usercommons.proxies.UserClaim> ClaimsMap)
-			throws UserCommonsException, com.mendix.core.CoreException {
-		ILogNode LOG = Core.getLogger("UserCommons");
-		if (principalConfigEntityAttribute.getClaimEntityAttribute_Claim() == null) {
-			LOG.error("Claim Mapping is not found for the configured principal");
-			throw new UserCommonsException("Claim Mapping is not found for the configured principal");
-		}
-		String UserPrincipalClaimName = principalConfigEntityAttribute.getClaimEntityAttribute_Claim().getName();
-		usercommons.proxies.UserClaim claim = ClaimsMap.get(UserPrincipalClaimName);
-		if (claim != null) {
-			if (principalConfigEntityAttribute.getClaimEntityAttribute_UserProvisioning() == null) {
-				LOG.error("No Userprovisioning configuration found for this Attribute Mapping.");
-				throw new UserCommonsException("No Userprovisioning configuration found for this Attribute Mapping.");
-			}
-			// extract the claimValue and substring it if it is greater than the maximum
-			// length of the attribute
-			String entityName = principalConfigEntityAttribute.getClaimEntityAttribute_UserProvisioning()
-					.getCustomEntity();
-			String attributeName = principalConfigEntityAttribute.getEntityMemberName();
-			IMetaObject metaObject = Core.getMetaObject(entityName);
-			IMetaPrimitive metaPrimitive = metaObject.getMetaPrimitive(attributeName);
-			int maxLength = metaPrimitive.getLength();
-			String claimValue = claim.getValue();
-			if (maxLength > 0 && claimValue.length() > maxLength) {
-				LOG.warn("Total length of PrincipalClaimValue is" + claimValue.length()
-						+ "so truncating the value based on the maximum field length i.e" + maxLength);
-				return claimValue.substring(0, maxLength);
-			} else {
-				return claimValue;
-			}
-		}
+    /**
+     * Retrieve the username attribute used for principal name comparison
+     */
+    private String getUserPrincipalAttribute() throws UserCommonsException {
+        String CustomEntityMember = this.UserProvisioning.getCustomEntityMember();
+        if (CustomEntityMember != null) {
+            return CustomEntityMember;
+        }
+        log.error("userPrincipleMemberName not configured");
+        throw new UserCommonsException("userPrincipleMemberName not configured");
+    }
 
-		LOG.error("user Principal claim " + UserPrincipalClaimName + "value is empty");
-		throw new UserCommonsException("user Principal claim " + UserPrincipalClaimName
-				+ "value is empty , Please select the Principal claim which contains value ");
+    /**
+     * Retrieve the user role to map to the created user
+     */
+    private IMendixObject getUserRole() throws CoreException {
+        UserRole role = this.UserProvisioning.getUserProvisioning_UserRole();
+        IMendixObject defaultUserRoleObject = null;
+        if (role != null)
+            defaultUserRoleObject = role.getMendixObject();
+        return defaultUserRoleObject;
+    }
 
-	}
+    /**
+     * Retrieve the configuration entity attribute for the user principal member
+     * name
+     */
+    private ClaimEntityAttribute getPrincipalConfigEntityAttribute(final String userPrincipleMemberName) throws UserCommonsException {
+        return ConfigEntityAttributesList.stream()
+                .filter(configEntityAttributes -> configEntityAttributes.getEntityMemberName().equals(userPrincipleMemberName))
+                .findFirst()
+                .orElseThrow(() -> {
+                    log.error("Map Principal attribute to any one of attribute of userclaims: " + userPrincipleMemberName);
+                    return new UserCommonsException(
+                            "Map Principal attribute to any one of attribute of userclaims: " + userPrincipleMemberName);
+                });
+    }
 
-	/**
-	 * finding the user based on the principle name
-	 */
-	private IMendixObject getUserObject(String userEntityName, String userPrincipalMemberName,
-			IMendixObject defaultUserRoleObject, String UserPrincipalClaimValue) throws UserCommonsException {
+    /**
+     * Retrieve the user principal claim value
+     */
+    private String getUserPrincipalClaimValue(ClaimEntityAttribute principalConfigEntityAttribute,
+                                              Map<String, UserClaim> ClaimsMap) throws UserCommonsException, CoreException {
 
-		List<IMendixObject> mxUserObjectList = MendixUtils.retrieveFromDatabase(getContext(),
-				"//%s[%s=$Username or (%s)=$UsernameSmall]", new HashMap<String, Object>() {
-					{
-						put("Username", UserPrincipalClaimValue);
-						put("UsernameSmall", UserPrincipalClaimValue.toLowerCase());
-					}
-				}, userEntityName, userPrincipalMemberName, userPrincipalMemberName);
+        final Claim claimEntityAttributeClaim = principalConfigEntityAttribute.getClaimEntityAttribute_Claim();
+        if (claimEntityAttributeClaim == null) {
+            log.error("Claim Mapping is not found for the configured principal");
+            throw new UserCommonsException("Claim Mapping is not found for the configured principal");
+        }
 
-		List<IMendixObject> mxUserObjectActualList = mxUserObjectList.stream()
-				.filter(mxUser -> UserPrincipalClaimValue
-						.equalsIgnoreCase(mxUser.getValue(getContext(), userPrincipalMemberName)))
-				.collect(Collectors.toList());
-		IMendixObject mxUser = null;
-		// We have exactly 1 match, use the one we find
-		if (mxUserObjectActualList.size() == 1) {
-			// success!
-			mxUser = mxUserObjectActualList.get(0);
-		} else if (mxUserObjectList.size() > 1) {
-			/*
-			 * We have multiple users that match the criteria This obviously can't happen
-			 * for username, but since we facilitate searching on fields such as fullname,
-			 * email phone, multiple matches are possible
-			 */
-			List<User> userList = new ArrayList<User>();
-			for (IMendixObject obj : mxUserObjectList) {
-				userList.add(User.initialize(getContext(), obj));
-			}
+        final String userPrincipalClaimName = claimEntityAttributeClaim.getName();
+        final UserClaim userClaim = ClaimsMap.get(userPrincipalClaimName);
+        if (userClaim != null) {
+            UserProvisioning claimEntityAttributeUserProvisioning = principalConfigEntityAttribute.getClaimEntityAttribute_UserProvisioning();
+            if (claimEntityAttributeUserProvisioning == null) {
+                log.error("No Userprovisioning configuration found for this Attribute Mapping.");
+                throw new UserCommonsException("No Userprovisioning configuration found for this Attribute Mapping.");
+            }
+            // extract the claimValue and substring it if it is greater than the maximum
+            // length of the attribute
+            final int maxLength = getPrincipalConfigEntityAttributeMaxLength(principalConfigEntityAttribute, claimEntityAttributeUserProvisioning);
+            final String claimValue = userClaim.getValue();
+            if (maxLength > 0 && claimValue.length() > maxLength) {
+                log.warn("Total length of PrincipalClaimValue is" + claimValue.length()
+                        + "so truncating the value based on the maximum field length i.e" + maxLength);
+                return claimValue.substring(0, maxLength);
+            }
 
-			User user = usercommons.proxies.microflows.Microflows.evaluateMultipleUserMatches(getContext(), userList);
-			if (user != null) {
-				mxUser = user.getMendixObject();
-			} else {
-				String errorMessage = "evaluateMultipleUserMatches implementation failed to return User from List of Users ";
-				throw new UserCommonsException(errorMessage);
-			}
+            return claimValue;
+        }
 
-		} else if (this.UserProvisioning.getAllowCreateUsers()) {
-			mxUser = createUser(userEntityName, userPrincipalMemberName, defaultUserRoleObject,
-					UserPrincipalClaimValue);
-		} else {
-			String errorMessage = "User lookup of '" + userPrincipalMemberName
-					+ "' failed, this user principal does not exist in the Mx database.";
-			throw new UserCommonsException(errorMessage);
-		}
-		return mxUser;
-	}
+        log.error("user Principal claim " + userPrincipalClaimName + "value is empty");
+        throw new UserCommonsException("user Principal claim " + userPrincipalClaimName
+                + "value is empty , Please select the Principal claim which contains value ");
 
-	/**
-	 * Create User based on Configuration
-	 */
-	private IMendixObject createUser(String userEntityName, String userPrincipleMemberName,
-			IMendixObject defaultUserRoleObject, String UserPrincipleClaimValue) {
-		IMendixObject mxUser;
-		ILogNode LOG = Core.getLogger("UserCommons");
-		mxUser = Core.instantiate(getContext(), userEntityName);
-		String userName = UserPrincipleClaimValue.toLowerCase(Locale.ROOT);
-		String name = userName.length() > 100 ? userName.substring(0, 100) : userName;
-		mxUser.setValue(getContext(), User.MemberNames.Name.toString(), name);
-		mxUser.setValue(getContext(), userPrincipleMemberName, userName);
-		mxUser.setValue(getContext(), User.MemberNames.Password.toString(),
-				RandomPasswordGenerator.generatePswd(15, 20, 4, 4, 4));
+    }
 
-		if (defaultUserRoleObject != null) {
-			List<IMendixIdentifier> userroles = new ArrayList<IMendixIdentifier>();
-			userroles.add(defaultUserRoleObject.getId());
-			mxUser.setValue(getContext(), User.MemberNames.UserRoles.toString(), userroles);
-			LOG.info("Associated userrole :"
-					+ defaultUserRoleObject.getValue(getContext(), UserRole.MemberNames.Name.toString()));
-		}
-		return mxUser;
-	}
+    private static int getPrincipalConfigEntityAttributeMaxLength(ClaimEntityAttribute principalConfigEntityAttribute, UserProvisioning claimEntityAttributeUserProvisioning) {
+        final String entityName = claimEntityAttributeUserProvisioning.getCustomEntity();
+        final String attributeName = principalConfigEntityAttribute.getEntityMemberName();
+        final IMetaObject metaObject = Core.getMetaObject(entityName);
+        final IMetaPrimitive metaPrimitive = metaObject.getMetaPrimitive(attributeName);
 
-	/**
-	 * Create the UserReportInfo object when there is no UserReportInfo object with
-	 * User Update UserType in first UserReportInfo object of list when there is no
-	 * UserType of UserReportInfo object with User
-	 * 
-	 * @param mxUser
-	 * @throws CoreException
-	 */
-	private void createOrUpdateUserReportInfo(IMendixObject mxUser) throws CoreException {
-		UserType userType = this.UserProvisioning.getUserType();
+        return metaPrimitive.getLength();
+    }
 
-		if (userType != null) {
-			List<IMendixObject> mxUserTypes = MendixUtils.retrieveFromDatabase(getContext(), "//%s[%s/%s=%s]",
-					new HashMap<String, Object>(), UserReportInfo.entityName,
-					UserReportInfo.MemberNames.UserReportInfo_User, User.entityName, mxUser.getId().toLong());
-			if (mxUserTypes != null && !mxUserTypes.isEmpty()) {
-				if (!mxUserTypes.stream().anyMatch(mxUserType -> userType.name()
-						.equals(mxUserType.getValue(getContext(), UserReportInfo.MemberNames.UserType.toString())))) {
-					IMendixObject mxUserType = mxUserTypes.get(0);
-					UserReportInfo userReportInfo = UserReportInfo.initialize(getContext(), mxUserType);
-					userReportInfo.setUserType(userType);
-					userReportInfo.commit();
-				}
-			} else {
-				IMendixObject mxUserType = Core.instantiate(getContext(), UserReportInfo.entityName);
-				UserReportInfo userReportInfo = UserReportInfo.initialize(getContext(), mxUserType);
-				userReportInfo.setUserType(userType);
-				userReportInfo.setUserReportInfo_User(User.initialize(getContext(), mxUser));
-				userReportInfo.commit();
-			}
-		}
+    /**
+     * Finding the user based on the principle name and create if not exists
+     */
+    private IMendixObject getOrCreateUserMendixObject(String userEntityName, String userPrincipalMemberName,
+                                                      IMendixObject defaultUserRoleObject, String UserPrincipalClaimValue) throws UserCommonsException {
 
-	}
+        IMendixObject mendixUserObject = getMendixUserObject(userEntityName, userPrincipalMemberName, UserPrincipalClaimValue);
+        if (mendixUserObject != null)
+            return mendixUserObject;
 
-	/**
-	 * Update User based on Configuration
-	 * 
-	 * @throws CoreException
-	 */
-	private void updateUserInfo(Map<String, usercommons.proxies.UserClaim> ClaimsMap, String userPrincipalMemberName,
-			IMendixObject mxUser) throws UserCommonsException, CoreException {
-		ILogNode LOG = Core.getLogger("UserCommons");
-		IMetaObject UserEntity = Core.getMetaObject(getUserEntityName());
-		for (usercommons.proxies.ClaimEntityAttribute mxClaim : ConfigEntityAttributesList) {
+        if (this.UserProvisioning.getAllowCreateUsers()) {
+            mendixUserObject = createUser(userEntityName, userPrincipalMemberName, defaultUserRoleObject,
+                    UserPrincipalClaimValue);
+        } else {
+            String errorMessage = "User lookup of '" + userPrincipalMemberName
+                    + "' failed, this user principal does not exist in the Mx database.";
+            throw new UserCommonsException(errorMessage);
+        }
 
-			try {
-				if (mxClaim.getClaimEntityAttribute_Claim() == null) {
-					LOG.error("IdP Attribute is not mapped for the configured entity attribute: "
-							+ mxClaim.getEntityMemberName());
-					throw new UserCommonsException("IdP Attribute is not mapped for the configured entity attribute:"
-							+ mxClaim.getEntityMemberName());
-				}
-				IMetaPrimitive mxobjectMember = UserEntity.getMetaPrimitive(mxClaim.getEntityMemberName());
-				String claimName = mxClaim.getClaimEntityAttribute_Claim().getName();
-				if (ClaimsMap.containsKey(claimName)) {
-					usercommons.proxies.UserClaim claim = ClaimsMap.get(claimName);
-					// Do not update the user principal value
-					if (userPrincipalMemberName.equals(mxobjectMember.getName())) {
-						continue;
-					}
-					if (mxobjectMember instanceof IMetaPrimitive) {
-						IMetaPrimitive mp = (IMetaPrimitive) mxobjectMember;
-						if (mp.getType() == IMetaPrimitive.PrimitiveType.DateTime) {
-							mxUser.setValue(getContext(), mxobjectMember.getName(), claim.getDateValue());
-						} else {
-							mxUser.setValue(getContext(), mxobjectMember.getName(), claim.getValue());
-						}
-					}
-					LOG.debug(String.format("%s is updated with  %s in user", claimName, claim.getValue()));
-				} else {
-					LOG.info(String.format("%s claim does not contain a value", claimName));
-				}
-			} catch (CoreException e) {
-				LOG.error("An error occured while trying to update the user entity with claims",
-						new RuntimeException(e.getCause()));
-				throw new UserCommonsException("An error occured while trying to update the user entity with claims");
+        return mendixUserObject;
+    }
 
-			}
+    private IMendixObject getMendixUserObject(String userEntityName, String userPrincipalMemberName, String UserPrincipalClaimValue) throws UserCommonsException {
+        List<IMendixObject> mendixUserObjectList = getUserMendixObjects(userEntityName, userPrincipalMemberName, UserPrincipalClaimValue);
+        if (mendixUserObjectList.isEmpty()) {
+            return null;
+        }
+        IMendixObject mendixUserObject = mendixUserObjectList.getFirst();
+        if (mendixUserObjectList.size() > 1) {
+            /*
+             * We have multiple users that match the criteria This obviously can't happen
+             * for username, but since we facilitate searching on fields such as fullname,
+             * email phone, multiple matches are possible.
+             */
+            User user = evaluateMultipleUserMatches(mendixUserObjectList); // This is a microflow that evaluates and returns a single user.
+            if (user == null)
+                throw new UserCommonsException("evaluateMultipleUserMatches implementation failed to return User from List of Users ");
 
-		}
-	}
+            mendixUserObject = user.getMendixObject();
+        }
+        return mendixUserObject;
+    }
 
-	/**
-	 * set Language and TimeZone
-	 */
-	private void setLanguageAndTimeZone(IMendixObject mxUser) throws CoreException {
-		String languageValue = UserInfoParameter.getLangCode();
-		String timeZoneValue = UserInfoParameter.getTimezoneCode();
-		User user = User.initialize(getContext(), mxUser);
-		setTimezoneForUser(user, timeZoneValue);
-		setLanguageForUser(user, languageValue);
-	}
+    private List<IMendixObject> getUserMendixObjects(String userEntityName, String userPrincipalMemberName, String UserPrincipalClaimValue) {
+        List<IMendixObject> mendixUserObjectList = MendixUtils.retrieveFromDatabase(getContext(),
+                "//%s[%s=$Username or (%s)=$UsernameSmall]", new HashMap<>() {
+                    {
+                        put("Username", UserPrincipalClaimValue);
+                        put("UsernameSmall", UserPrincipalClaimValue.toLowerCase(Locale.ROOT));
+                    }
+                }, userEntityName, userPrincipalMemberName, userPrincipalMemberName);
+        return mendixUserObjectList;
+    }
 
-	/**
-	 * Sets the user's Timezone based on the IdP-provided code. Falls back to the
-	 * Mendix app default timezone if the IdP code is invalid or missing. Leaves the
-	 * field empty if no valid timezone is found.
-	 */
-	private void setTimezoneForUser(User user, String timezoneCode) throws CoreException {
-		ILogNode LOG = Core.getLogger("UserCommons");
-		if (timezoneCode != null) {
-			List<TimeZone> IdPTimezone = TimeZone.load(getContext(), String.format("[Code='%s']", timezoneCode));
-			if (IdPTimezone != null && !timezoneCode.isEmpty()) {
-				user.setUser_TimeZone(IdPTimezone.get(0));
-				LOG.info("Timezone from IdP set successfully to User");
-			}
-		}
-	}
+    private User evaluateMultipleUserMatches(List<IMendixObject> mendixUserObjectList) {
+        List<User> userList = new ArrayList<>();
+        for (IMendixObject obj : mendixUserObjectList) {
+            userList.add(User.initialize(getContext(), obj));
+        }
 
-	/**
-	 * Sets the user's language based on the IdP-provided code. Falls back to the
-	 * Mendix app default language if the IdP code is invalid or missing. Leaves the
-	 * field empty if no valid language is found.
-	 */
-	private void setLanguageForUser(User user, String languageCode) throws CoreException {
-		ILogNode LOG = Core.getLogger("UserCommons");
-		if (languageCode != null) {
-			List<Language> langs = Language.load(getContext(), String.format("[Code='%s']", languageCode));
-			if (langs != null && !langs.isEmpty()) {
-				user.setUser_Language(langs.get(0));
-				LOG.info("Language from IdP set successfully to User");
-			}
-		}
-		if (user.getUser_Language() == null) {
-			ILanguage defaultAppLanguage = Core.getLanguage(getContext());
-			if (defaultAppLanguage != null) {
-				List<Language> defaultLanguage = Language.load(getContext(),
-						String.format("[Code='%s']", defaultAppLanguage.getCode()));
-				if (defaultLanguage != null && !defaultLanguage.isEmpty()) {
-					user.setUser_Language(defaultLanguage.get(0));
-				}
-			}
-		}
-	}
+        return Microflows.evaluateMultipleUserMatches(getContext(), userList);
+    }
 
-	/**
-	 * Handles custom provisioning logic for a given Mendix user object. If custom
-	 * user provisioning is defined, executes the associated microflow with the
-	 * necessary parameters.
-	 */
-	private void handleCustomProvisioning(IMendixObject mxUser) throws com.mendix.core.CoreException {
-		String customUserProvisioning = this.UserProvisioning.getCustomUserProvisioning();
-		if (customUserProvisioning != null && !customUserProvisioning.trim().isEmpty()) {
-			Core.microflowCall(customUserProvisioning).inTransaction(true)
-					.withParam("UserInfoParameter", UserInfoParameter.getMendixObject())
-					.withParam("User", User.initialize(getContext(), mxUser).getMendixObject()).execute(getContext());
-		}
-	}
+    /**
+     * Create User based on Configuration
+     */
+    private IMendixObject createUser(String userEntityName, String userPrincipleMemberName,
+                                     IMendixObject defaultUserRoleObject, String UserPrincipleClaimValue) {
+        IMendixObject mxUser;
+        mxUser = Core.instantiate(getContext(), userEntityName);
+        String userName = UserPrincipleClaimValue.toLowerCase(Locale.ROOT);
+        String name = userName.length() > 100 ? userName.substring(0, 100) : userName;
+        mxUser.setValue(getContext(), User.MemberNames.Name.toString(), name);
+        mxUser.setValue(getContext(), userPrincipleMemberName, userName);
+        mxUser.setValue(getContext(), User.MemberNames.Password.toString(),
+                RandomPasswordGenerator.generatePswd(15, 20, 4, 4, 4));
+
+        if (defaultUserRoleObject != null) {
+            List<IMendixIdentifier> userroles = new ArrayList<IMendixIdentifier>();
+            userroles.add(defaultUserRoleObject.getId());
+            mxUser.setValue(getContext(), User.MemberNames.UserRoles.toString(), userroles);
+            log.info("Associated userrole :"
+                    + defaultUserRoleObject.getValue(getContext(), UserRole.MemberNames.Name.toString()));
+        }
+        return mxUser;
+    }
+
+    /**
+     * Create the UserReportInfo object when there is no UserReportInfo object with
+     * User Update UserType in first UserReportInfo object of list when there is no
+     * UserType of UserReportInfo object with User
+     *
+     * @param mendixUserObject
+     * @throws CoreException
+     */
+    private void createOrUpdateUserReportInfo(IMendixObject mendixUserObject) throws CoreException {
+        UserType userType = this.UserProvisioning.getUserType();
+
+        if (userType != null) {
+            List<IMendixObject> mendixUserReportInfoList = MendixUtils.retrieveFromDatabase(getContext(), "//%s[%s/%s=%s]",
+                    new HashMap<>(), UserReportInfo.entityName,
+                    UserReportInfo.MemberNames.UserReportInfo_User, User.entityName, mendixUserObject.getId().toLong());
+            if (mendixUserReportInfoList != null && !mendixUserReportInfoList.isEmpty()) {
+                boolean userReportInfoNotFound = mendixUserReportInfoList.stream()
+                        .noneMatch(mxUserType -> userType.name()
+                                .equals(mxUserType.getValue(getContext(), UserReportInfo.MemberNames.UserType.toString()))
+                        );
+                if (userReportInfoNotFound) {
+                    IMendixObject mendixUserReportInfo = mendixUserReportInfoList.getFirst();
+                    createUserReportInfoObject(null, mendixUserReportInfo, userType);
+                }
+            } else {
+                IMendixObject mendixUserReportInfoObject = Core.instantiate(getContext(), UserReportInfo.entityName);
+                createUserReportInfoObject(mendixUserObject, mendixUserReportInfoObject, userType);
+            }
+        }
+    }
+
+    private void createUserReportInfoObject(IMendixObject mendixUserObject, IMendixObject mendixUserReportInfoObject, UserType userType) throws CoreException {
+        UserReportInfo userReportInfo = UserReportInfo.initialize(getContext(), mendixUserReportInfoObject);
+        userReportInfo.setUserType(userType);
+
+        if (mendixUserObject != null)
+            userReportInfo.setUserReportInfo_User(User.initialize(getContext(), mendixUserObject));
+        userReportInfo.commit();
+    }
+
+    /**
+     * Update User based on Configuration
+     */
+    private void updateUserInfo(Map<String, UserClaim> ClaimsMap, String userPrincipalMemberName, IMendixObject mendixUserObject) throws UserCommonsException {
+        final IMetaObject userEntity = Core.getMetaObject(getUserEntityName());
+        for (ClaimEntityAttribute claimEntityAttribute : ConfigEntityAttributesList) {
+
+            try {
+                final String entityMemberName = claimEntityAttribute.getEntityMemberName();
+                if (claimEntityAttribute.getClaimEntityAttribute_Claim() == null) {
+                    String errorMessage = "IdP Attribute is not mapped for the configured entity attribute: "
+                            + entityMemberName;
+                    log.error(errorMessage);
+                    throw new UserCommonsException(errorMessage);
+                }
+
+                final IMetaPrimitive mendixObjectMember = userEntity.getMetaPrimitive(entityMemberName);
+                final String claimName = claimEntityAttribute.getClaimEntityAttribute_Claim().getName();
+                if (ClaimsMap.containsKey(claimName)) {
+                    final UserClaim claim = ClaimsMap.get(claimName);
+                    // Do not update the user principal value
+                    if (userPrincipalMemberName.equals(mendixObjectMember.getName())) {
+                        continue;
+                    }
+
+                    final Object value = mendixObjectMember.getType() == IMetaPrimitive.PrimitiveType.DateTime
+                            ? claim.getDateValue() : claim.getValue();
+                    mendixUserObject.setValue(getContext(), mendixObjectMember.getName(), value);
+
+                    log.debug(String.format("%s is updated with  %s in user", claimName, claim.getValue()));
+                } else {
+                    log.info(String.format("%s claim does not contain a value", claimName));
+                }
+            } catch (CoreException e) {
+                log.error("An error occured while trying to update the user entity with claims",
+                        new RuntimeException(e.getCause()));
+                throw new UserCommonsException("An error occured while trying to update the user entity with claims");
+
+            }
+        }
+    }
+
+    /**
+     * set Language and TimeZone
+     */
+    private void setLanguageAndTimeZone(IMendixObject mxUser) throws CoreException {
+        String languageValue = UserInfoParameter.getLangCode();
+        String timeZoneValue = UserInfoParameter.getTimezoneCode();
+        User user = User.initialize(getContext(), mxUser);
+        setTimezoneForUser(user, timeZoneValue);
+        setLanguageForUser(user, languageValue);
+    }
+
+    /**
+     * Sets the user's Timezone based on the IdP-provided code. Falls back to the
+     * Mendix app default timezone if the IdP code is invalid or missing. Leaves the
+     * field empty if no valid timezone is found.
+     */
+    private void setTimezoneForUser(User user, String timezoneCode) throws CoreException {
+        if (timezoneCode != null) {
+            List<TimeZone> idPTimezones = TimeZone.load(getContext(), String.format("[Code='%s']", timezoneCode));
+            if (idPTimezones != null && !timezoneCode.isEmpty()) {
+                user.setUser_TimeZone(idPTimezones.getFirst());
+                log.info("Timezone from IdP set successfully to User");
+            }
+        }
+    }
+
+    /**
+     * Sets the user's language based on the IdP-provided code. Falls back to the
+     * Mendix app default language if the IdP code is invalid or missing. Leaves the
+     * field empty if no valid language is found.
+     */
+    private void setLanguageForUser(User user, String languageCode) throws CoreException {
+        if (languageCode != null) {
+            List<Language> languages = Language.load(getContext(), String.format("[Code='%s']", languageCode));
+            if (languages != null && !languages.isEmpty()) {
+                user.setUser_Language(languages.getFirst());
+                log.info("Language from IdP set successfully to User");
+            }
+        }
+        if (user.getUser_Language() == null) {
+            ILanguage defaultAppLanguage = Core.getLanguage(getContext());
+            if (defaultAppLanguage != null) {
+                List<Language> defaultLanguage = Language.load(getContext(),
+                        String.format("[Code='%s']", defaultAppLanguage.getCode()));
+                if (defaultLanguage != null && !defaultLanguage.isEmpty()) {
+                    user.setUser_Language(defaultLanguage.getFirst());
+                }
+            }
+        }
+    }
+
+    /**
+     * Handles custom provisioning logic for a given Mendix user object. If custom
+     * user provisioning is defined, executes the associated microflow with the
+     * necessary parameters.
+     */
+    private void handleCustomProvisioning(IMendixObject mendixUserObject) {
+        String customUserProvisioning = this.UserProvisioning.getCustomUserProvisioning();
+        if (customUserProvisioning != null && !customUserProvisioning.trim().isEmpty()) {
+            Core.microflowCall(customUserProvisioning).inTransaction(true)
+                    .withParam("UserInfoParameter", UserInfoParameter.getMendixObject())
+                    .withParam("User", User.initialize(getContext(), mendixUserObject).getMendixObject())
+                    .execute(getContext());
+        }
+    }
 	// END EXTRA CODE
 }
