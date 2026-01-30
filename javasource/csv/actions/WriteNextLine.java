@@ -16,6 +16,7 @@ import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
 import com.mendix.systemwideinterfaces.core.meta.IMetaObject;
 import com.mendix.systemwideinterfaces.core.meta.IMetaPrimitive;
+import com.mendix.webui.CustomJavaAction;
 import com.opencsv.CSVWriter;
 import csv.impl.CSV;
 import com.mendix.systemwideinterfaces.core.UserAction;
