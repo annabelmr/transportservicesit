@@ -2,7 +2,6 @@ package mtaschedulermodule;
 
 import com.mendix.core.Core;
 import com.mendix.core.CoreException;
-import com.mendix.core.conf.RuntimeVersion;
 import com.mendix.core.objectmanagement.member.MendixBoolean;
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
