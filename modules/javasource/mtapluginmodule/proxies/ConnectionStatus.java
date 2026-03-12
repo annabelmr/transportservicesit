@@ -6,11 +6,11 @@ package mtapluginmodule.proxies;
 
 public enum ConnectionStatus
 {
-	Connected("49ee75a8-37c5-457c-a73d-ce62bb5a8821"),
-	Disconnected("bb8069af-7617-4c33-80ec-49bbdf6c9918"),
-	Error("c9b8d81e-dd1d-4e58-bc51-11ec99c0433a"),
-	SettingUp("9b35e3b6-87ba-4857-8bc5-6e2276dae606"),
-	NotConnected("7954ea09-2f1d-4193-af4c-bb910cddf54d");
+	Connected("1837a7ab-f0ce-40f4-a37f-ac6b6f82d730"),
+	Disconnected("872c322b-d593-45f9-ba27-72e1611edccb"),
+	Error("032b1854-ebd6-4b89-9151-7e84f6bdacad"),
+	SettingUp("91f6c448-3a20-4898-9f47-91751a70b9b4"),
+	NotConnected("a999cc80-b8a5-492c-b901-ffe554b8e0cd");
 
 	private final java.lang.String i18nCaptionKey;
 	
